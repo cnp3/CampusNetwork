@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Towards LLN
+ip link set dev BXL-eth0 up
+ip address add dev BXL-eth0 fd00:255:b111::b1/64
+
+# Towards BELNET
+ip link set dev BXL-eth1 up
+ip address add dev BXL-eth1 fd00:255:beb1::b1/64
+
+bird6 -s /tmp/BXL.ctl

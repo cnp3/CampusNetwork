@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ip link set dev L1-eth0 up
+ip address add dev L1-eth0 fd00:255:11::1/48
+# Add a default route on the host towards the nearest router
+ip -6 route add ::/0 via fd00:255:11::
+
+# Start an iperf server
+iperf -V -s &> /dev/null &

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# zebra can manage for us the ip addresses of the interfaces.
+# see cfg/LLN/zebra.conf
+
+# We want to increase the network security in case of bugs in the routing
+# daemons. We thus want to run these as low-privileged user (quagga) and
+# group (quagga). As a result, we must ensure the configuration files are
+# readable by that user/group.
+chown -R quagga /etc/quagga
+chgrp -R quagga /etc/quagga
+
+API=/tmp/LLN.api
+
+zebra -d -k -u quagga -g quagga\
+    -f /etc/quagga/zebra.conf\
+    -i /tmp/LLN_zebra.pid\
+    -z "$API"
+
+retries=0
+while [ ! -e "$API" ]; do
+    inotifywait -qqt2 -e create "$(dirname $API)"
+    ((++retries))
+    if ((retries > 4)); then
+        echo "Zebra did not create its API socket, giving up"
+        exit 1
+    fi
+done
+
+ospf6d -d -u quagga -g quagga\
+    -f /etc/quagga/ospf6d.conf\
+    -i /tmp/LLN_ospf6.pid\
+    -z "$API"

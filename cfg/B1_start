@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ip link set dev B1-eth0 up
+ip address add dev B1-eth0 fd00:255:be::1/48
+# Add a default route on the host towards the nearest router
+ip -6 route add ::/0 via fd00:255:be::

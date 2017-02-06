@@ -1,0 +1,41 @@
+router id 255.0.0.2;
+
+protocol kernel {
+ 	learn;
+	scan time 20;
+	export all;
+}
+
+protocol device {
+	scan time 10;		
+}
+
+protocol ospf {
+
+    area 0.0.0.0 {
+        interface "*eth*" {
+            hello 1;
+            dead 3;
+        };
+        interface "*lan*" {
+           stub 1;
+        };
+    };
+}
+
+/* Define one bgp session block per peer */
+protocol bgp provider200 {
+    local as ##ASN##;
+    neighbor fd00:200::b as 200;
+    /* You could peer with other groups here */
+    /* Smarter filters could be usefull ... */
+    export all;
+    import all;
+}
+
+protocol bgp provider300 {
+    local as ##ASN##;
+    neighbor fd00:300::b as 300;
+    export all;
+    import all;
+}

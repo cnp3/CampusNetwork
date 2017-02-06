@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Abort on error // swap with -x to trace execution (debug)
+set -e
+
+# Load global config
+source "$(cd "$(dirname "$0")"; pwd -P)/../example_topo"
+
+
+# Add the addresses for our public interfaces towards BGP peers
+ip address add dev as200 "fd00:200::${GROUPNUMBER}"
+ip address add dev as300 "fd00:300::${GROUPNUMBER}"
+
+# The BELNET - BXL link, defaults to fd00:255:beb1::be/64
+ip address add dev BELNET-eth0 "${PREFIXBASE}:beb1::be/64"
+
+# Assign an IP address (and an associated subnet prefix length)
+# to the fist subnet connected to this router (defaults to fd00:255:be::/48)
+ip address add dev BELNET-lan0 "${PREFIXBASE}:be::/$((PREFIXLEN+16))"
+
+# Crude way to adapt the router configuration to the current group number 
+sed "s/##ASN##/${GROUPNUMBER}/" /etc/bird/bird6.conf.templ > /etc/bird/bird6.conf
+
+# Start BIRD
+bird6 -s /tmp/BELNET.ctl
