@@ -11,9 +11,13 @@ them.
 A sample virtual machine definition to run the script is provided and managed
 using [Vagrant](www.vagrantup.com).
 
-Once vagrant is installed on your machine, issuing `vagrant up` will build
-the virtual machine (happens only once) and start the VM. `vagrant ssh` can then
+Once vagrant is installed on your machine, run the `build_vm.sh` script to 
+create and provision the virtual machine. `vagrant ssh` can then
 be used to access the VM.
+
+`vagrant halt` will stop the VM.
+`vagrant up` will start the VM (to be used instead of the build script once the
+VM has been built once).
 
 # Introduction
 
