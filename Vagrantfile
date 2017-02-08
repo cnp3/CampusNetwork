@@ -18,7 +18,8 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-EOD
     apt-get -y -qq --force-yes update
     apt-get -y -qq --force-yes install git bash vim-nox tcpdump nano\
-                                              bird6 quagga inotify-tools
+                                              bird6 quagga inotify-tools\
+                                              iperf
 
     update-rc.d quagga disable &> /dev/null || true
     update-rc.d bird disable &> /dev/null || true
