@@ -5,8 +5,8 @@ Vagrant.configure(2) do |config|
   config.vm.box = "debian/jessie64"
 
   # We need 2 extra interfaces besides the one from
-  config.vm.network "private_network", ip: "fd00:200::255"
-  config.vm.network "private_network", ip: "fd00:300::255"
+  config.vm.network "private_network", ip: "10.0.0.1", auto_config: false
+  config.vm.network "private_network", ip: "10.0.0.2", auto_config: false
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "2048"
