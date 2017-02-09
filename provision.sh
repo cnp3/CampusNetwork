@@ -11,4 +11,4 @@ update-rc.d bird6 disable &> /dev/null || true
 
 (cd /sbin && ln -s /usr/lib/quagga/* .)
 
-su vagrant -c 'cd & git clone https://github.com/oliviertilmans/LINGI2142-setup.git'
+su vagrant -c 'cd && git clone https://github.com/oliviertilmans/LINGI2142-setup.git'
