@@ -9,6 +9,10 @@ update-rc.d quagga disable &> /dev/null || true
 update-rc.d bird disable &> /dev/null || true
 update-rc.d bird6 disable &> /dev/null || true
 
+service quagga stop
+service bird stop
+service bird6 stop
+
 (cd /sbin && ln -s /usr/lib/quagga/* .)
 
 su vagrant -c 'cd && git clone https://github.com/oliviertilmans/LINGI2142-setup.git'
