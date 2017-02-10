@@ -573,13 +573,23 @@ function start_tayga {
 
     sysctl -w net.ipv4.ip_forward=1
     sysctl -w net.ipv6.conf.eth0.forwarding=1
+    # If forwarding, then by default RFC2462 transforms this node into a router,
+    # thus causes it ignore RAs. As we are masquerading, bypass this.
+    sysctl -w net.ipv6.conf.eth0.accept_ra=2
     sysctl -w "net.ipv6.conf.${TAYGADEV}.forwarding=1"
     $TAYGA
     info "Started tayga"
 }
 
+function _default_sysctl {
+    local default
+    default=$(sysctl "$1")
+    sysctl -w "${1}=$default"
+}
+
 function stop_tayga {
-    sysctl -w net.ipv6.conf.eth0.forwarding=0
+    _default_sysctl net.ipv6.conf.eth0.forwarding
+    _default_sysctl net.ipv6.conf.eth0.accept_ra
     sysctl -w "net.ipv6.conf.${TAYGADEV}.forwarding=0"
 
     killall -s 9 tayga &> /dev/null
