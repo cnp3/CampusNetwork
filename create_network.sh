@@ -12,7 +12,7 @@ function node_cfg {
 # $1: node name
 # $2: script name
 function node_exec {
-    local cfg=
+    local cfg
     cfg=$(node_cfg "$1")
     local SPATH="${cfg}_$2"
     if [ -x "$SPATH" ]; then

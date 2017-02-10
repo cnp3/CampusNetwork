@@ -1,0 +1,39 @@
+#!/bin/bash
+
+
+# You can override any of these settings on a per-topology basis
+# Group number
+GROUPNUMBER=255
+# Node configs  
+CONFIGDIR=example_cfg
+PREFIXA="fd00:200:${GROUPNUMBER}::/48"
+PREFIXB="fd00:200:${GROUPNUMBER}::/48"
+
+# This function describes the network topology that we want to emulate
+function mk_topo {
+    echo "@@ Adding links and nodes"
+    add_link MICH SH1CA # mich-eth0 sh1c-eth0
+    add_link SH1C HALL  # sh1c-eth1 hall-eth0 
+    add_link HALL PYTH  # hall-eth1 pyth-eth0
+    add_link STEV PYTH  # stev-eth0 pyth-eth1
+    add_link STEV CARN  # stev-eth1 carn-eth0
+    add_link CARN MICH  # carn-eth1 mich-eth1
+    add_link PYTH CARN  # pyth-eth2 carn-eth2
+
+    echo "@@ Adding LANs"
+    mk_LAN MICH MI1 MI2
+    mk_LAN SH1C SH1 SH2
+    mk_LAN HALL HA1 HA2
+    mk_LAN PYTH PY1 PY2
+    mk_LAN STEV ST1 ST2
+    mk_LAN CARN CA1 CA2
+
+
+    echo "@@ Briding the network"
+    bridge_node HALL eth2 belneta
+    bridge_node PYTH eth1 belnetb
+    # We likely want to have redundant connections to our 2 providers
+    # bridge_node HALL eth1 HALL-belnetb
+    # bridge_node PYTH eth2 HALL-belneta
+}
+

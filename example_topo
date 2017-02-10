@@ -16,7 +16,7 @@
 # Group number
 GROUPNUMBER=255
 # Node configs  
-CONFIGDIR=cfg
+CONFIGDIR=example_cfg
 # boot script name
 BOOT="boot"
 # startup script name
