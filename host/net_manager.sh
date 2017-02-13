@@ -37,8 +37,10 @@ ZONE_INGI="${BDIR}/db.ingi"
 REVERSE_INGI="${BDIR}/db.${NETBASE}"
 # BGP ASNs
 declare -A BGP_ASN
-BGP_ASN['belneta']=200
-BGP_ASN['belnetb']=300
+BGP_ASN['belneta']=300
+BGP_ASN['belnetb']=200
+# Return the ASN keys in a sorted fashion
+ASN_KEYS=$("${!BGP_ASN[@]}" | tr " " "\n" | sort | tr "\n" " ")
 # NAT64 prefix
 NAT64PREFIX="${NETBASE}:64"
 # Tayga config file location
@@ -355,7 +357,7 @@ d.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.d.f.ip6.arpa.    IN 
 
 EOD
     # Add bindings for the BGP peerings
-    for peer in "${!BGP_ASN[@]}"; do
+    for peer in $ASN_KEYS; do
         asn_address "${BGP_ASN[${peer}]}"
         local src="$__ret"
         IFS='' read -r -d '' __ret << EOD || true
@@ -491,9 +493,10 @@ function start_pop {
 
     local asn="${BGP_ASN[$1]}"
     asn_address "$asn"
+    local range="${__ret}"
     # We assign fd00:xxxx::/48 to the bridge, e.g. do not include
     # peer's domains unless they announce it to us
-    ip address add dev "$1" "${__ret}/$((BASELEN+32))"
+    ip address add dev "$1" "${range}/$((BASELEN+32))"
     mk_bgpd_config "$asn"
 
     asn_cfg "$asn"
@@ -506,6 +509,10 @@ function start_pop {
     ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
     ip6tables -A FORWARD -i eth0 -o "$1" -m state --state RELATED,ESTABLISHED -j ACCEPT
     ip6tables -A FORWARD -i "$1" -o eth0 -j ACCEPT
+    # Drop any unrelated traffic from the bridge
+    ip6tables -A FORWARD -i "$br" -s "${range}/$((BASELEN+16))" -j ACCEPT
+    ip6tables -A FORWARD -i "$br" -d "${range}/$((BASELEN+16))" -j ACCEPT
+    ip6tables -A FORWARD -i "$br" -j DROP
     # Block IPv4 traffic on the POP bridge
     iptables -I FORWARD -o "$1" -j DROP
     iptables -I FORWARD -i "$1" -j DROP
@@ -513,10 +520,18 @@ function start_pop {
 
 function kill_pop {
     ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-    ip6tables -A FORWARD -i eth0 -o "$1" -m state --state RELATED,ESTABLISHED -j ACCEPT
-    ip6tables -A FORWARD -i "$1" -o eth0 -j ACCEPT
+    ip6tables -D FORWARD -i eth0 -o "$1" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    ip6tables -D FORWARD -i "$1" -o eth0 -j ACCEPT
     iptables -D FORWARD -o "$1" -j DROP
     iptables -D FORWARD -i "$1" -j DROP
+
+    pop_name "$1"
+    local br="$__ret"
+    asn_address "${BGP_ASN[$1]}"
+    local range="${__ret}"
+    ip6tables -D FORWARD -i "$br" -s "${range}/$((BASELEN+16))" -j ACCEPT
+    ip6tables -D FORWARD -i "$br" -d "${range}/$((BASELEN+16))" -j ACCEPT
+    ip6tables -D FORWARD -i "$br" -j DROP
 
     sysctl -w "net.ipv6.conf.${1}.forwarding=0"
 
@@ -537,7 +552,7 @@ function start_network {
     start_tayga
     start_named
 
-    for pop in "${!BGP_ASN[@]}"; do
+    for pop in $ASN_KEYS; do
         start_pop "$pop"
     done
 }
@@ -548,7 +563,7 @@ function kill_network {
     stop_named
     stop_tayga
 
-    for pop in "${!BGP_ASN[@]}"; do
+    for pop in $ASN_KEYS; do
         kill_pop "$pop"
     done
 }
@@ -651,8 +666,19 @@ function _confirm {
 function _cleanup_vm {
     debg "Cleaning up VM files for group $1"
     interfaces_list "$g"
+    local count=0
     for i in "${__ret_array[@]}"; do
         ip tuntap del dev "$i" mode tap
+
+        pop_name "${ASN_KEYS[$count]}"
+        local rangebase="${NETBASE}:${BGP_ASN[$__ret]}"
+        local subnet="${rangebase}:${1}::/$((BASELEN+16))"
+        ip6tables -D FORWARD -i "$i" -s "$subnet" -j ACCEPT
+        ip6tables -D FORWARD -i "$i" -s "${rangebase}::$1" -j ACCEPT
+        ip6tables -D FORWARD -i "$i" -d "$subnet" -j ACCEPT
+        ip6tables -D FORWARD -i "$i" -d "${rangebase}::$1" -j ACCEPT
+        ip6tables -D FORWARD -i "$i" -j DROP
+        ((++count))
     done
     
     ctrl_sock "$g"
@@ -716,11 +742,18 @@ function start_vm {
         local cid="g${1}c${count}"
         CMD+=" -device e1000,netdev=${cid}"
         CMD+=" -netdev tap,id=${cid},script=no,ifname=${i}"
-        local keys=(${!BGP_ASN[@]})
-        pop_name "${keys[$count]}"
+        pop_name "${ASN_KEYS[$count]}"
         info "Bridging $i on $__ret"
         ip link set dev "$i" master "$__ret"
         ip link set dev "$i" up
+        local rangebase="${NETBASE}:${BGP_ASN[$__ret]}"
+        local subnet="${rangebase}:${1}::/$((BASELEN+16))"
+        # Drop unrelated traffic
+        ip6tables -A FORWARD -i "$i" -s "$subnet" -j ACCEPT
+        ip6tables -A FORWARD -i "$i" -s "${rangebase}::$1" -j ACCEPT
+        ip6tables -A FORWARD -i "$i" -d "$subnet" -j ACCEPT
+        ip6tables -A FORWARD -i "$i" -d "${rangebase}::$1" -j ACCEPT
+        ip6tables -A FORWARD -i "$i" -j DROP
         ((++count))
     done
 

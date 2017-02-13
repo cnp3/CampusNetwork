@@ -7,7 +7,7 @@ GROUPNUMBER=255
 # Node configs  
 CONFIGDIR=example_cfg
 PREFIXA="fd00:200:${GROUPNUMBER}::/48"
-PREFIXB="fd00:200:${GROUPNUMBER}::/48"
+PREFIXB="fd00:300:${GROUPNUMBER}::/48"
 
 # This function describes the network topology that we want to emulate
 function mk_topo {
