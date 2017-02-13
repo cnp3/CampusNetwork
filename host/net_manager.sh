@@ -40,7 +40,7 @@ declare -A BGP_ASN
 BGP_ASN['belneta']=300
 BGP_ASN['belnetb']=200
 # Return the ASN keys in a sorted fashion
-ASN_KEYS=$("${!BGP_ASN[@]}" | tr " " "\n" | sort | tr "\n" " ")
+ASN_KEYS=$(echo "${!BGP_ASN[@]}" | tr " " "\n" | sort | tr "\n" " ")
 # NAT64 prefix
 NAT64PREFIX="${NETBASE}:64"
 # Tayga config file location
