@@ -894,6 +894,11 @@ EOD
 ## main()
 ###############################################################################
 
+if [ "$UID" -ne "0" ]; then
+    warn "This script must be run as root!"
+    exit 1
+fi
+
 [ "$#" -lt "1" ] && print_help
 while getopts ":hskdrS:K:D:R:C:-:V:ntB:" optchar; do
     case "${optchar}" in
