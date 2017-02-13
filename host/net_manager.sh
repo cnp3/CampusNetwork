@@ -542,7 +542,9 @@ function kill_pop {
     ip link set dev "$__ret" down
     ip link del dev "$__ret"
 
-    killall -s 9 bird6
+    ctrl_sock "${BGP_ASN[$1]}"
+    debg "Killing BIRD for ${1}/$__ret"
+    echo "down" | birdc6 -s "$__ret"
 }
 
 
@@ -592,13 +594,13 @@ function start_tayga {
     # thus causes it ignore RAs. As we are masquerading, bypass this.
     sysctl -w net.ipv6.conf.eth0.accept_ra=2
     sysctl -w "net.ipv6.conf.${TAYGADEV}.forwarding=1"
-    $TAYGA
+    $TAYGA -p tayga.pid
     info "Started tayga"
 }
 
 function _default_sysctl {
     local default
-    default=$(sysctl "$1")
+    default=$(sysctl -n "$1")
     sysctl -w "${1}=$default"
 }
 
@@ -607,7 +609,7 @@ function stop_tayga {
     _default_sysctl net.ipv6.conf.eth0.accept_ra
     sysctl -w "net.ipv6.conf.${TAYGADEV}.forwarding=0"
 
-    killall -s 9 tayga &> /dev/null
+    kill -s 9 "$(cat tayga.pid)" &> /dev/null
     debg "Stopped tayga"
 
     iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
@@ -668,8 +670,6 @@ function _cleanup_vm {
     interfaces_list "$g"
     local count=0
     for i in "${__ret_array[@]}"; do
-        ip tuntap del dev "$i" mode tap
-
         pop_name "${ASN_KEYS[$count]}"
         local rangebase="${NETBASE}:${BGP_ASN[$__ret]}"
         local subnet="${rangebase}:${1}::/$((BASELEN+16))"
@@ -678,6 +678,7 @@ function _cleanup_vm {
         ip6tables -D FORWARD -i "$i" -d "$subnet" -j ACCEPT
         ip6tables -D FORWARD -i "$i" -d "${rangebase}::$1" -j ACCEPT
         ip6tables -D FORWARD -i "$i" -j DROP
+        ip tuntap del dev "$i" mode tap
         ((++count))
     done
     
