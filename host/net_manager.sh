@@ -40,7 +40,7 @@ declare -A BGP_ASN
 BGP_ASN['belneta']=300
 BGP_ASN['belnetb']=200
 # Return the ASN keys in a sorted fashion
-ASN_KEYS=$(echo "${!BGP_ASN[@]}" | tr " " "\n" | sort | tr "\n" " ")
+ASN_KEYS=($(echo "${!BGP_ASN[@]}" | tr " " "\n" | sort | tr "\n" " "))
 # NAT64 prefix
 NAT64PREFIX="${NETBASE}:64"
 # Tayga config file location
@@ -48,7 +48,7 @@ TAYGACONF="${BDIR}/tayga.conf"
 TAYGAv4="192.168.255.1"
 TAYGAv4RANGE="192.168.255.0/24"
 TAYGADEV="nat64"
-TAYGA="tayga -c ${TAYGACONF}"
+TAYGACHROOT="/tmp/tayga"
 
 
 ###############################################################################
@@ -266,9 +266,12 @@ function asn_address {
 # Output a BGP config for one of the two providers
 # $1: ASN
 function mk_bgpd_config {
+    asn_address "$1"
+    local src="$__ret"
     local neigh
     read -r -d '' neigh << EOD || true
 router id 192.0.0.${1:0:1};
+listen bgp address ${src} port 179;
 
 protocol kernel {
     export all;
@@ -287,8 +290,6 @@ filter only_default {
 
 
 EOD
-    asn_address "$1"
-    local src="$__ret"
     for g in "${ALL_GROUPS[@]}"; do
         IFS='' read -r -d '' __ret << EOD || true
 protocol bgp group${g} {
@@ -357,7 +358,7 @@ d.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.d.f.ip6.arpa.    IN 
 
 EOD
     # Add bindings for the BGP peerings
-    for peer in $ASN_KEYS; do
+    for peer in "${ASN_KEYS[@]@}"; do
         asn_address "${BGP_ASN[${peer}]}"
         local src="$__ret"
         IFS='' read -r -d '' __ret << EOD || true
@@ -451,7 +452,7 @@ tun-device $TAYGADEV
 ipv4-addr $TAYGAv4
 prefix ${NAT64PREFIX}::/96
 dynamic-pool $TAYGAv4RANGE
-data-dir /tmp/tayga
+data-dir $TAYGACHROOT
 
 EOD
     echo "$cfg" > "$TAYGACONF"
@@ -542,7 +543,7 @@ function kill_pop {
     ip link set dev "$__ret" down
     ip link del dev "$__ret"
 
-    ctrl_sock "${BGP_ASN[$1]}"
+    asn_ctl "${BGP_ASN[$1]}"
     debg "Killing BIRD for ${1}/$__ret"
     echo "down" | birdc6 -s "$__ret"
 }
@@ -554,7 +555,7 @@ function start_network {
     start_tayga
     start_named
 
-    for pop in $ASN_KEYS; do
+    for pop in "${ASN_KEYS[@]}"; do
         start_pop "$pop"
     done
 }
@@ -565,7 +566,7 @@ function kill_network {
     stop_named
     stop_tayga
 
-    for pop in $ASN_KEYS; do
+    for pop in "${ASN_KEYS[@]}"; do
         kill_pop "$pop"
     done
 }
@@ -575,7 +576,7 @@ function start_tayga {
 
     if ! ip l sh dev "$TAYGADEV" ; then
         debg "Creating tayga device $TAYGADEV"
-        $TAYGA --mktun
+        tayga --mktun -c "$TAYGACONF"
     fi
 
     debg "Configuring NAT64 routes"
@@ -594,7 +595,7 @@ function start_tayga {
     # thus causes it ignore RAs. As we are masquerading, bypass this.
     sysctl -w net.ipv6.conf.eth0.accept_ra=2
     sysctl -w "net.ipv6.conf.${TAYGADEV}.forwarding=1"
-    $TAYGA -p tayga.pid
+    tayga -c "$TAYGACONF" -p tayga.pid
     info "Started tayga"
 }
 
@@ -609,7 +610,8 @@ function stop_tayga {
     _default_sysctl net.ipv6.conf.eth0.accept_ra
     sysctl -w "net.ipv6.conf.${TAYGADEV}.forwarding=0"
 
-    kill -s 9 "$(cat tayga.pid)" &> /dev/null
+    # Tayga creates its pid file *after* chrooting to its data dir
+    kill -s 9 "$(cat $TAYGACHROOT/tayga.pid)" &> /dev/null
     debg "Stopped tayga"
 
     iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
@@ -617,7 +619,8 @@ function stop_tayga {
     iptables -D FORWARD -i "$TAYGADEV" -o eth0 -j ACCEPT
     debg "Removed NATing rules for $TAYGADEV"
 
-    $TAYGA --rmtun
+    ip link set dev "$TAYGADEV" down
+    tayga --rmtun -c "$TAYGACONF"
     debg "Removed the $TAYGADEV interface"
 }
 
@@ -670,8 +673,9 @@ function _cleanup_vm {
     interfaces_list "$g"
     local count=0
     for i in "${__ret_array[@]}"; do
-        pop_name "${ASN_KEYS[$count]}"
-        local rangebase="${NETBASE}:${BGP_ASN[$__ret]}"
+        local as="${ASN_KEYS[$count]}"
+        local asn="${BGP_ASN[$as]}"
+        local rangebase="${NETBASE}:${asn}"
         local subnet="${rangebase}:${1}::/$((BASELEN+16))"
         ip6tables -D FORWARD -i "$i" -s "$subnet" -j ACCEPT
         ip6tables -D FORWARD -i "$i" -s "${rangebase}::$1" -j ACCEPT
@@ -743,11 +747,14 @@ function start_vm {
         local cid="g${1}c${count}"
         CMD+=" -device e1000,netdev=${cid}"
         CMD+=" -netdev tap,id=${cid},script=no,ifname=${i}"
-        pop_name "${ASN_KEYS[$count]}"
-        info "Bridging $i on $__ret"
-        ip link set dev "$i" master "$__ret"
+        local as="${ASN_KEYS[$count]}"
+        pop_name "$as"
+        local peer="$__ret"
+        local asn="${BGP_ASN[$as]}"
+        info "Bridging $i on $__ret (POP${asn}/$peer)"
+        ip link set dev "$i" master "$peer"
         ip link set dev "$i" up
-        local rangebase="${NETBASE}:${BGP_ASN[$__ret]}"
+        local rangebase="${NETBASE}:${asn}"
         local subnet="${rangebase}:${1}::/$((BASELEN+16))"
         # Drop unrelated traffic
         ip6tables -A FORWARD -i "$i" -s "$subnet" -j ACCEPT
