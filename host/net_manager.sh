@@ -154,7 +154,7 @@ function enable_sshd_login {
     chroot "$3" chown "$2" "/$k"
     local cmd='mkdir -p ~/.ssh/ && cat '
     cmd+="/$k"
-    cmd+=' >> ~/.ssh/authorized_keys'
+    cmd+=' > ~/.ssh/authorized_keys'
     debg "Authorizing the key"
     chroot "$3" su "$2" -c "$cmd"
 }
