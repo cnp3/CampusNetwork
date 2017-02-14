@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Group numbers
-ALL_GROUPS=(1 2 3 4 5 6 7 8 9 10)
+ALL_GROUPS=(1 2 3 5 6 7 10)
 # The qemu executable on *this* machine
 QEMU=qemu-system-x86_64
 # Verbosity
@@ -14,6 +14,10 @@ BASE_DISK="disk.qcow2"
 MEM=2G
 # Base prefix for the whole network
 NETBASE='fd00'
+# Base prefix for SSH guest forwarding
+SSHBASE="${NETBASE}:beef"
+# Bridge on which we attach all SSH management interfaces of the VMs
+SSHBR="sshbr"
 # Prefix len for $NETBASE
 BASELEN=16
 # Store this script location
@@ -61,17 +65,16 @@ function prepare_vm {
     mk_master_hd
 
     local mountpoint=loop
-    local dev=/dev/nbd0
-    mount_qcow "$BASE_DISK" "$mountpoint" "$dev"
+    mount_qcow "$BASE_DISK" "$mountpoint"
 
     debg "Provisioning"
     provision_disk "$mountpoint"
     setup_sshd "$mountpoint"
-    enable_sshd_login "$MASTERKEY" root "$mountpoint"
+    enable_sshd_login "$MASTERKEY" root "$mountpoint" /root
     # Set the resolver to our local DNS64
     echo "nameserver ${BIND_ADDRESS}" > "${mountpoint}/etc/resolv.conf"
     
-    umount_qcow "$mountpoint" "$dev"
+    umount_qcow "$mountpoint"
     debg "VM base hdd is complete"
 }
 
@@ -145,50 +148,76 @@ function setup_sshd {
 # $1: key name
 # $2: user name
 # $3: chroot mount point
+# $4: user home dir
 function enable_sshd_login {
-    debg "Generating ssh key-pair $1 for user $2 in $3"
-    ssh-keygen -b 2048 -t rsa -f "$1" -q -N ""
+    if [ ! -e "$1" ] || [ ! -e "${1}.pub" ]; then
+        debg "Generating ssh key-pair $1 for user $2 in $3"
+        ssh-keygen -b 2048 -t rsa -f "$1" -q -N ""
+    fi
     # Copy the generated key in the HD
-    local k="${1}.pub"
-    cp "$k" "${3}/$k"
-    chroot "$3" chown "$2" "/$k"
-    local cmd='mkdir -p ~/.ssh/ && cat '
-    cmd+="/$k"
-    cmd+=' > ~/.ssh/authorized_keys'
     debg "Authorizing the key"
-    chroot "$3" su "$2" -c "$cmd"
+    local k="${1}.pub"
+    local sshdir="${3}${4}/.ssh"
+    mkdir -p "$sshdir"
+    cp "$k" "${sshdir}/authorized_keys"
+    chroot "$3" chown -R "$2" "${4}/.ssh"
 }
 
 # Mount a qcow disk image to a directory
 # $1: path to disk image
 # $2: mount directory
-# $3: ndb dev
 function mount_qcow {
     debg "Mounting disk $1 on $2"
     mkdir -p "$2"
-    modprobe nbd max_part=63
-    sleep .5
-    qemu-nbd -c "$3" "$BASE_DISK"
-    sleep .5
-    mount "${3}p1" "$2"
+    guestmount -a "$1" -i --pid mountpid.pid "$2"
     sleep .5
     mk_chroot "$2"
 }
 
 # umount a qcow disk
 # $1: directory on which the disk has been mounted
-# $2: ndb dev
 function umount_qcow {
-    chroot "$1" sync
     sync
     del_chroot "$1"
     set -e
     debg "Unmounting $1"
-    umount "$1"
+    local pid
+    pid=$(cat mountpid.pid)
+    guestunmount "$1"
+    count=10
+    while kill -0 "$pid" 2>/dev/null && [ $count -gt 0 ]; do
+        sleep .5
+        ((count--))
+    done
+    rm -f mountpid.pid
     sleep .5
     set +e
-    qemu-nbd -d "$2"
-    sleep .5
+}
+
+# Provision eth0 on the VM
+# $1: group number
+# $2: mount point
+function configure_management_interface {
+    local cfg="${mountpoint}/etc/network/interfaces"
+    # Remove default config
+    sed -i 's/iface eth0 inet dhcp//' "$cfg"
+    guest_ssh_address "$1"
+    local ssh_guest_address="$__ret"
+    # Assign a static address to eth0
+    cat << EOD >> "$cfg"
+# SSH gateway for remote access
+auto eth0
+iface eth0 inet6 static
+    address $ssh_guest_address
+    netmask 64
+
+# Leave these unnumbered and configure instead the addresses of their bridged
+# Counterparts in the corresponding border routers
+auto eth1
+iface eth1 inet manual
+auto eth2
+iface eth2 inet manual
+EOD
 }
 
 # Provision a new group
@@ -201,21 +230,27 @@ function provision_group {
     info "Creating overlay hdd for group $1"
     local hda
     hda=$(group_hda "$1")
-    qemu-img create -b "$BASE_DISK" -f qcow2 "$hda"
+    qemu-img create -o "backing_file=${BASE_DISK},backing_fmt=qcow2" -f qcow2 "$hda"
 
     local mountpoint=loop
-    local dev=/dev/nbd0
-    mount_qcow "$hda" "$mountpoint" "$dev"
+    mount_qcow "$hda" "$mountpoint"
 
     # Generate and add a key for the group
-    enable_sshd_login "group$1" vagrant "$mountpoint"
-    
-    umount_qcow "$mountpoint" "$dev"
+    enable_sshd_login "group$1" vagrant "$mountpoint" /home/vagrant
+    configure_management_interface "$1" "$mountpoint"
+
+    umount_qcow "$mountpoint"
 }
 
 ###############################################################################
 ## VMs properties
 ###############################################################################
+
+# The IPv6 addresses listening for SSH connection on the guest mahcine
+# $1: group number
+function guest_ssh_address {
+    __ret="${SSHBASE}::${1}"
+}
 
 # The name of the virtual dist for a given group
 # $1: group number
@@ -239,6 +274,11 @@ function ctrl_sock {
 # $1: group number
 function tcp_fw_port {
     __ret=$((TCPFWBASE + $1))
+}
+
+# The name of the administrative interface of the VM
+function vm_admin_if {
+    __ret="g${1}-ssh"
 }
 
 ###############################################################################
@@ -481,11 +521,13 @@ function pop_name {
 # Start on POP: a bridge with a BGP router connected to all VMs
 # $1: pop name
 function start_pop {
+    # Create the POP fabric
     pop_name "$1"
     local br="$__ret"
     ip link add name "$br" type bridge
     ip link set dev "$br" up
 
+    # Connect the master interface to the fabric
     local out="${1}-out"
     ip link add name "$1" type veth peer name "$out"
     ip link set dev "$out" master "$br"
@@ -505,27 +547,24 @@ function start_pop {
     asn_ctl "$asn"
     bird6 -c "$cfg" -s "$__ret"
 
+    # Enable IPv6 forwarding on the master interface
     sysctl -w "net.ipv6.conf.${1}.forwarding=1"
 
-    ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    # Accept incoming related traffic towards the master interface
     ip6tables -A FORWARD -i eth0 -o "$1" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    # No restrictions on outgoing traffic
     ip6tables -A FORWARD -i "$1" -o eth0 -j ACCEPT
-    # Drop any unrelated traffic from the bridge
+    # Drop any unrelated traffic from the bridge with the POP prefix
     ip6tables -A FORWARD -i "$br" -s "${range}/$((BASELEN+16))" -j ACCEPT
     ip6tables -A FORWARD -i "$br" -d "${range}/$((BASELEN+16))" -j ACCEPT
     ip6tables -A FORWARD -i "$br" -j DROP
     # Block IPv4 traffic on the POP bridge
-    iptables -I FORWARD -o "$1" -j DROP
-    iptables -I FORWARD -i "$1" -j DROP
+    iptables -I FORWARD -o "$br" -j DROP
+    iptables -I FORWARD -i "$br" -j DROP
 }
 
 function kill_pop {
-    ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-    ip6tables -D FORWARD -i eth0 -o "$1" -m state --state RELATED,ESTABLISHED -j ACCEPT
-    ip6tables -D FORWARD -i "$1" -o eth0 -j ACCEPT
-    iptables -D FORWARD -o "$1" -j DROP
-    iptables -D FORWARD -i "$1" -j DROP
-
+    # Invert all iptables rules
     pop_name "$1"
     local br="$__ret"
     asn_address "${BGP_ASN[$1]}"
@@ -533,21 +572,30 @@ function kill_pop {
     ip6tables -D FORWARD -i "$br" -s "${range}/$((BASELEN+16))" -j ACCEPT
     ip6tables -D FORWARD -i "$br" -d "${range}/$((BASELEN+16))" -j ACCEPT
     ip6tables -D FORWARD -i "$br" -j DROP
+    ip6tables -D FORWARD -i eth0 -o "$1" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    ip6tables -D FORWARD -i "$1" -o eth0 -j ACCEPT
+    iptables -D FORWARD -o "$1" -j DROP
+    iptables -D FORWARD -i "$1" -j DROP
 
     sysctl -w "net.ipv6.conf.${1}.forwarding=0"
 
+    # Remove the master interface
     ip link set dev "$1" down
     ip link del dev "$1"
 
-    pop_name "$1"
-    ip link set dev "$__ret" down
-    ip link del dev "$__ret"
+    # Remove the brige
+    ip link set dev "$br" down
+    ip link del dev "$br"
 
-    asn_ctl "${BGP_ASN[$1]}"
+    local asn="${BGP_ASN[$1]}"
+    # Tell BIRD to stop
+    asn_ctl "$asn"
     debg "Killing BIRD for ${1}/$__ret"
     echo "down" | birdc6 -s "$__ret"
-}
 
+    asn_cfg "$asn"
+    rm "$__ret"
+}
 
 function start_network {
     info "Starting the host network"
@@ -555,6 +603,26 @@ function start_network {
     start_tayga
     start_named
 
+    # Create the SSH management bridge
+    if ! ip link show dev "$SSHBR"; then
+        info "Creating SSH management bridge"
+        ip link add name "$SSHBR" type bridge
+        ip link set dev "$SSHBR" up
+        ip link add name "${SSHBR}-in" type veth peer name "${SSHBR}-out"
+        ip link set dev "${SSHBR}-out" master "$SSHBR"
+        ip link set dev "${SSHBR}-out" up
+        ip link set dev "${SSHBR}-in" up
+        ip address add dev "${SSHBR}-in" "${SSHBASE}::/64"
+        # Enable IPv6 forwarding towards the management bridge
+        sysctl -w "net.ipv6.conf.${SSHBR}-in.forwarding=1"
+        ip6tables -A FORWARD -i eth0 -o "${SSHBR}-in" -j ACCEPT
+        ip6tables -A FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT
+        # We masquerade the source of external traffic as the VM will not have
+        # a route towards it ...
+        ip6tables -t nat -I POSTROUTING ! -s "${SSHBASE}::" -o "${SSHBR}-in" -j SNAT --to-source "${SSHBASE}::"
+    fi
+
+    ip6tables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source "$(get_v6)"
     for pop in "${ASN_KEYS[@]}"; do
         start_pop "$pop"
     done
@@ -569,6 +637,17 @@ function kill_network {
     for pop in "${ASN_KEYS[@]}"; do
         kill_pop "$pop"
     done
+    ip6tables -t nat -D POSTROUTING -o eth0 -j SNAT --to-source "$(get_v6)"
+
+    # Delete the management bridge
+    info "Tearing down SSH management bridge"
+    ip link set dev "$SSHBR" down
+    ip link del dev "$SSHBR"
+    ip link set dev "${SSHBR}-in" down
+    ip link del dev "${SSHBR}-in"
+    ip6tables -D FORWARD -i eth0 -o "${SSHBR}-in" -j ACCEPT
+    ip6tables -D FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT
+    ip6tables -t nat -D POSTROUTING ! -s "${SSHBASE}::" -o "${SSHBR}-in" -j SNAT --to-source "${SSHBASE}::"
 }
 
 function start_tayga {
@@ -585,7 +664,7 @@ function start_tayga {
     ip route add "${NAT64PREFIX}::/96" dev "$TAYGADEV"
 
     debg "NATing interface $TAYGADEV"
-    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source "$(get_v4)"
     iptables -A FORWARD -i eth0 -o "$TAYGADEV" -m state --state RELATED,ESTABLISHED -j ACCEPT
     iptables -A FORWARD -i "$TAYGADEV" -o eth0 -j ACCEPT
 
@@ -612,9 +691,10 @@ function stop_tayga {
 
     # Tayga creates its pid file *after* chrooting to its data dir
     kill -s 9 "$(cat $TAYGACHROOT/tayga.pid)" &> /dev/null
+    rm -f "$TAYGACHROOT/tayga.pid"
     debg "Stopped tayga"
 
-    iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+    iptables -t nat -D POSTROUTING -o eth0 -j SNAT --to-source "$(get_v4)"
     iptables -D FORWARD -i eth0 -o "$TAYGADEV" -m state --state RELATED,ESTABLISHED -j ACCEPT
     iptables -D FORWARD -i "$TAYGADEV" -o eth0 -j ACCEPT
     debg "Removed NATing rules for $TAYGADEV"
@@ -622,6 +702,8 @@ function stop_tayga {
     ip link set dev "$TAYGADEV" down
     tayga --rmtun -c "$TAYGACONF"
     debg "Removed the $TAYGADEV interface"
+
+    rm "$TAYGACONF"
 }
 
 function stop_named {
@@ -670,7 +752,7 @@ function _confirm {
 # $1: group number
 function _cleanup_vm {
     debg "Cleaning up VM files for group $1"
-    interfaces_list "$g"
+    interfaces_list "$1"
     local count=0
     for i in "${__ret_array[@]}"; do
         local as="${ASN_KEYS[$count]}"
@@ -685,13 +767,53 @@ function _cleanup_vm {
         ip tuntap del dev "$i" mode tap
         ((++count))
     done
-    
-    ctrl_sock "$g"
+
+    del_ssh_management_port "$1"
+
+    ctrl_sock "$1"
     unlink "$__ret"
-    __ret=$(group_hda "$g")
+    __ret=$(group_hda "$1")
     unlink "$__ret"
-    unlink "group$g"
-    unlink "group$g.pub"
+}
+
+# Create an initialize the management port for the VM
+# $1: group number
+# $2: port
+# $3: interface name
+function setup_ssh_management_port {
+    local port="$2"
+    local intf="$3"
+    if ! ip l sh dev "$intf"; then
+        debg "Creating TAP interface $intf for SSH access to the VM"
+        ip tuntap add dev "$intf" mode tap
+        ip l set dev "$intf" master "$SSHBR"
+        ip l set dev "$intf" up
+
+        guest_ssh_address "$1"
+        local sshtarget="$__ret"
+
+        debg "Forwarding host TCP port ${port} to group $1 on $sshtarget"
+        # Infer destination IPv6 address from destination port
+        # We also rewrite the source IP address (cfr. start_network)
+        ip6tables -t nat -A PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
+        # Rewrite source port based on source address, and replace source address
+        # by the public address.
+        ip6tables -t nat -I POSTROUTING -s "${sshtarget}" -p tcp --sport 22 -j SNAT --to-source "[$(get_v6)]:${port}"
+    fi
+}
+
+# Remove the ssh management interface and its associated rules
+# $1: group number
+function del_ssh_management_port {
+    tcp_fw_port "$1"
+    local port="$__ret"
+    vm_admin_if "$1"
+    local intf="$__ret"
+    ip tuntap del dev "$intf" mode tap
+    guest_ssh_address "$1"
+    local sshtarget="$__ret"
+    ip6tables -t nat -D PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
+    ip6tables -t nat -D POSTROUTING -s "${sshtarget}" -p tcp --sport 22 -j SNAT --to-source "[$(get_v6)]:${port}"
 }
 
 ###############################################################################
@@ -710,6 +832,16 @@ function start_all_vms {
     done
     for g in "${ALL_GROUPS[@]}"; do
         start_vm "$g"
+    done
+    info "Waiting for the VM to boot"
+    set_hostnames
+}
+
+function set_hostnames {
+    for g in "${ALL_GROUPS[@]}"; do
+        local hname="group$g"
+        debg "Setting VM hostname for $hname"
+        ssh -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" hostnamectl set-hostname "$hname"
     done
 }
 
@@ -730,38 +862,41 @@ function start_vm {
     ctrl_sock "$1"
     CMD+=" -monitor unix:${__ret},server,nowait"
 
-    # Forwards ssh connection to the VM
+    # eth0 on the VM will be the SSH gateway for remote access
     tcp_fw_port "$1"
     local port="$__ret"
-    CMD+=" -netdev user,id=fwd${1},hostfwd=tcp::${port}-:22"
+    vm_admin_if "$1"
+    local intf="$__ret"
+    setup_ssh_management_port "$1" "$port" "$intf"
+    CMD+=" -netdev tap,id=fwd${1},script=no,ifname=${intf}"
     CMD+=" -device e1000,netdev=fwd$1"
-    debg "Forwarding host TCP port ${port} to group $1"
 
     local count=0
     interfaces_list "$1"
     for i in "${__ret_array[@]}"; do
-        if ! ip l sh dev "$i" ; then
-            debg "Creating TAP interface $i"
-            ip tuntap add dev "$i" mode tap
-        fi
-        local cid="g${1}c${count}"
-        CMD+=" -device e1000,netdev=${cid}"
-        CMD+=" -netdev tap,id=${cid},script=no,ifname=${i}"
         local as="${ASN_KEYS[$count]}"
         pop_name "$as"
         local peer="$__ret"
         local asn="${BGP_ASN[$as]}"
-        info "Bridging $i on $__ret (POP${asn}/$peer)"
+        if ! ip l sh dev "$i" ; then
+            debg "Creating TAP interface $i"
+            ip tuntap add dev "$i" mode tap
+            local rangebase="${NETBASE}:${asn}"
+            local subnet="${rangebase}:${1}::/$((BASELEN+16))"
+            # Drop unrelated traffic (either the BGP traffic, or the delegated
+            # prefix)
+            ip6tables -A FORWARD -i "$i" -s "$subnet" -j ACCEPT
+            ip6tables -A FORWARD -i "$i" -s "${rangebase}::$1" -j ACCEPT
+            ip6tables -A FORWARD -i "$i" -d "$subnet" -j ACCEPT
+            ip6tables -A FORWARD -i "$i" -d "${rangebase}::$1" -j ACCEPT
+            ip6tables -A FORWARD -i "$i" -j DROP
+        fi
+        local cid="g${1}c${count}"
+        CMD+=" -device e1000,netdev=${cid}"
+        CMD+=" -netdev tap,id=${cid},script=no,ifname=${i}"
+        info "Bridging $i on $peer (POP${asn}/$peer)"
         ip link set dev "$i" master "$peer"
         ip link set dev "$i" up
-        local rangebase="${NETBASE}:${asn}"
-        local subnet="${rangebase}:${1}::/$((BASELEN+16))"
-        # Drop unrelated traffic
-        ip6tables -A FORWARD -i "$i" -s "$subnet" -j ACCEPT
-        ip6tables -A FORWARD -i "$i" -s "${rangebase}::$1" -j ACCEPT
-        ip6tables -A FORWARD -i "$i" -d "$subnet" -j ACCEPT
-        ip6tables -A FORWARD -i "$i" -d "${rangebase}::$1" -j ACCEPT
-        ip6tables -A FORWARD -i "$i" -j DROP
         ((++count))
     done
 
@@ -788,7 +923,10 @@ function kill_vm {
     info "Killing VM for group $1"
     # Send the poweroff signal to the QM monitor of the VM
     ctrl_sock "$1"
-    echo system_powerdown | socat - "UNIX-CONNECT:${__ret}"
+    IFS='' cat << EOD | socat - "UNIX-CONNECT:${__ret}"
+    system_powerdown
+
+EOD
 }
 
 DESTROYDELAY=5
@@ -828,26 +966,36 @@ function restart_named {
 function restart_all_vms {
     _confirm "Restart all VMs?"
     kill_all_vms
+    sleep "$DESTROYDELAY"
     start_all_vms
 }
 
 # $1: group number
 function restart_vm {
     kill_vm "$1"
+    sleep "$DESTROYDELAY"
     start_vm "$1"
 }
 
 # $1: group number
 function connect_to {
+    set -x 
+    ssh -6 -b "${SSHBASE}::" -o "IdentityFile=$MASTERKEY" -p 22 "root@${SSHBASE}::${1}"
+    set +x
+}
+
+# $1: group number
+function conn_vagra {
     tcp_fw_port "$1"
-    set -x
-    ssh -o IdentityFile="$MASTERKEY" -p "$__ret" root@localhost
+    set -x 
+    ssh -6 -o "IdentityFile=group${1}" -p "$__ret" "vagrant@nostromo.info.ucl.ac.be"
     set +x
 }
 
 function fetch_deps {
     apt-get -y --q --force-yes update
-    apt-get -y --q --force-yes install socat tayga qemu bird6 bind9
+    apt-get -y --q --force-yes install socat tayga qemu bird6 bind9\
+                                       qemu-system libguestfs-tools
     update-rc.d bind9 disable
     service bind9 stop
     update-rc.d bird6 disable
@@ -867,6 +1015,22 @@ function asn_cli {
     birdc6 -s "$__ret"
 }
 
+function shutdown_net {
+    kill_all_vms
+    sleep "$DESTROYDELAY"
+    killall "$QEMU"
+    sleep 2
+    for i in $(seq 10); do
+        for j in e0 e1 ssh; do
+            ip tunta del dev "g${i}-${j}" mode tap;
+        done;
+    done
+    iptables -F
+    iptables -F -t nat
+    ip6tables -F
+    ip6tables -F -t nat
+}
+
 function print_help {
     IFS='' read -r -d '' msg << EOD || true
 Usage: $0 {action} [param] where {action} is one of
@@ -874,8 +1038,10 @@ Usage: $0 {action} [param] where {action} is one of
     -s/--start      Start all VMs, the BGP daemons, DNS resolver, and bridge them
     -S [group]      Start the VM of [group]
 
-    -k/--kill       Stop all VMs, and shutdown the network and its services
+    -k/--kill       Stop all VMs, and services
     -K [group]      Stop the VM of [group]
+    --shutdown      Stop all VMs and destroy the network
+    --hostname      Sets all hostnames in the network
 
     -r/--restart    Restart the whole network
     -R [group]      Restart the VM of [group]
@@ -887,7 +1053,8 @@ Usage: $0 {action} [param] where {action} is one of
     -t/--tayga      (Re)start the tayga NAT64 daemon
     -B [ASN]        Connect to the router CLI of [ASN]
 
-    -C [group]      Open an SSH connection to the VM of [group]
+    -C [group]      Open an SSH connection to the VM of [group] as root
+    -c [group]      Open an SSH connection to the VM of [group] as user 'vagrant'
 
     -V [level]      Set log verbosity level (higher means less verbose, [0-3])
     -h/--help       Display this message
@@ -907,7 +1074,7 @@ if [ "$UID" -ne "0" ]; then
 fi
 
 [ "$#" -lt "1" ] && print_help
-while getopts ":hskdrS:K:D:R:C:-:V:ntB:" optchar; do
+while getopts ":hskdrS:K:D:R:C:-:V:ntB:c:" optchar; do
     case "${optchar}" in
         -)
             case "${OPTARG}" in
@@ -919,7 +1086,9 @@ while getopts ":hskdrS:K:D:R:C:-:V:ntB:" optchar; do
                 tayga)   restart_tayga  ;;
                 help)    print_help     ;;
                 fetch-deps) fetch_deps  ;;
-                *)       echo "Unknown option --${OPTARG}" >&2;;
+                shutdown) shutdown_net  ;;
+                hostname) set_hostnames ;;
+                *) echo "Unknown option --${OPTARG}" >&2 ;;
             esac;;
         s) start_all_vms       ;;
         S) start_vm "$OPTARG"  ;;
@@ -932,10 +1101,11 @@ while getopts ":hskdrS:K:D:R:C:-:V:ntB:" optchar; do
         n) restart_named       ;;
         t) restart_tayga       ;;
         C) connect_to "$OPTARG";;
+        c) conn_vagra "$OPTARG";;
         V) LOG_LEVEL="$OPTARG" ;;
         h) print_help          ;;
         B) asn_cli "$OPTARG"   ;;
-        :) echo "Missing argument for -${OPTARG}" >&2; exit 1;;
+        :) echo "Missing argument for -${OPTARG}" >&2 ;;
         *) print_help          ;;
     esac
 done
