@@ -269,13 +269,14 @@ function mk_bgpd_config {
     asn_address "$1"
     local src="$__ret"
     local neigh
-    read -r -d '' neigh << EOD || true
+    IFS='' read -r -d '' neigh << EOD || true
 router id 192.0.0.${1:0:1};
 listen bgp address ${src} port 179;
 
 protocol kernel {
     export all;
     import all;
+    learn;
     scan time 20;
 }   
 
@@ -283,11 +284,10 @@ protocol device {
     scan time 10;
 }
 
-filter only_default {
-    if net = ::/0 then accept;
+filter only_kernel_routes {
+    if source = RTS_INHERIT then accept;
     reject;
 }
-
 
 EOD
     for g in "${ALL_GROUPS[@]}"; do
@@ -302,7 +302,7 @@ protocol bgp group${g} {
             accept;
         reject;
     };
-    export filter only_default;
+    export filter only_kernel_routes;
 }
 
 EOD
@@ -895,7 +895,6 @@ Usage: $0 {action} [param] where {action} is one of
     --fetch-deps    Install the required dependencies to run this script
 EOD
     echo "$msg" >&2
-    exit 1
 }
 
 ###############################################################################
