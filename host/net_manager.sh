@@ -616,7 +616,7 @@ function start_network {
         # Enable IPv6 forwarding towards the management bridge
         sysctl -w "net.ipv6.conf.${SSHBR}-in.forwarding=1"
         ip6tables -A FORWARD -i eth0 -o "${SSHBR}-in" -j ACCEPT
-        ip6tables -A FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT
+        ip6tables -A FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT -m conntrack --ctstate ESTABLISHED,RELATED
         # We masquerade the source of external traffic as the VM will not have
         # a route towards it ...
         ip6tables -t nat -I POSTROUTING ! -s "${SSHBASE}::" -o "${SSHBR}-in" -j SNAT --to-source "${SSHBASE}::"
@@ -646,7 +646,7 @@ function kill_network {
     ip link set dev "${SSHBR}-in" down
     ip link del dev "${SSHBR}-in"
     ip6tables -D FORWARD -i eth0 -o "${SSHBR}-in" -j ACCEPT
-    ip6tables -D FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT
+    ip6tables -D FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT -m conntrack --ctstate RELATED,ESTABLISHED
     ip6tables -t nat -D POSTROUTING ! -s "${SSHBASE}::" -o "${SSHBR}-in" -j SNAT --to-source "${SSHBASE}::"
 }
 
@@ -798,7 +798,7 @@ function setup_ssh_management_port {
         ip6tables -t nat -A PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
         # Rewrite source port based on source address, and replace source address
         # by the public address.
-        ip6tables -t nat -I POSTROUTING -s "${sshtarget}" -p tcp --sport 22 -j SNAT --to-source "[$(get_v6)]:${port}"
+        ip6tables -t nat -I POSTROUTING -o eth0 -s "${sshtarget}" -p tcp --sport 22 -j SNAT --to-source "[$(get_v6)]:${port}"
     fi
 }
 
@@ -813,7 +813,7 @@ function del_ssh_management_port {
     guest_ssh_address "$1"
     local sshtarget="$__ret"
     ip6tables -t nat -D PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
-    ip6tables -t nat -D POSTROUTING -s "${sshtarget}" -p tcp --sport 22 -j SNAT --to-source "[$(get_v6)]:${port}"
+    ip6tables -t nat -D POSTROUTING -o eth0 -s "${sshtarget}" -p tcp --sport 22 -j SNAT --to-source "[$(get_v6)]:${port}"
 }
 
 ###############################################################################
