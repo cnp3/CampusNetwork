@@ -1066,9 +1066,115 @@ Usage: $0 {action} [param] where {action} is one of
     -V [level]      Set log verbosity level (higher means less verbose, [0-3])
     -h/--help       Display this message
 
+    --status        Print the status of each VM
+
     --fetch-deps    Install the required dependencies to run this script
 EOD
     echo "$msg" >&2
+}
+
+function ping_status {
+    if ping6 -c 3 -i 0.2 "$1" | grep '3 received' &> /dev/null; then
+        echo "ping:ok"
+    else
+        echo "\e[31mping:down\e[39m"
+    fi
+}
+
+function ssh_status {
+    if echo "" | nc "$1" 22 | grep "SSH" &> /dev/null; then
+        echo "ssh:ok"
+    else
+        echo "\e[31mssh:down\e[39m"
+    fi
+}
+
+function admin_status {
+    vm_admin_if "$1"
+    if ! ip link sh dev "$__ret" | grep UP &> /dev/null; then
+        echo "\e[31mmngmt{${__ret},status:down}\e[39m"
+    else
+        local ifname="$__ret"
+        guest_ssh_address "$1"
+        local addr="$__ret"
+        local pingres
+        pingres=$(ping_status "$addr")
+        local sshres
+        sshres=$(ssh_status "$addr")
+        local statuscurr="{${ifname}@${addr}, status:up, ${pingres}, ${sshres}}"
+        if [[ "$statuscurr"  =~ "\e[31m" ]]; then
+            echo "mngmnt $statuscurr"
+
+        else
+            echo "\e[32mmngmt\e[39m $statuscurr"
+        fi
+    fi
+}
+
+function bgp_status {
+    asn_ctl "$1"
+    if [ !  -e "$__ret" ]; then
+        echo "\e[31mbgp:POP${1}-down\e[39m"
+    else
+        local statuscode
+        statuscode=$(echo "sh prot" | birdc6 -s "$__ret" | grep "$2 " | sed 's/.*master[ ]*[^ ]*[ ]*[^ ]*[ ]*\([^ ]*\).*/\1/')
+        echo "bgp:${statuscode}"
+    fi
+}
+
+function if_status {
+    local out=""
+    local count=0
+    interfaces_list "$1"
+    for i in "${__ret_array[@]}"; do
+        out+="\n        "
+        local as="${ASN_KEYS[$count]}"
+        pop_name "$as"
+        local peer="$__ret"
+        local asn="${BGP_ASN[$as]}"
+        local heading="${peer}/POP${asn}"
+        if ! ip link sh dev "$i" | grep UP &> /dev/null; then
+            out+="\e[31m${heading}{${i},status:down}\e[39m"
+        else
+            local addr="${NETBASE}:${asn}::${1}"
+            local pingres
+            pingres=$(ping_status "$addr")
+            local bgpres
+            bgpres=$(bgp_status "$asn" "group$1")
+            local statuscurr="{${i}@${addr}, status:up, ${pingres}, ${bgpres}}"
+            if [[ "$statuscurr"  =~ "\e[31m" ]]; then
+                out+="${heading} $statuscurr"
+
+            else
+                out+="\e[32m${heading}\e[39m $statuscurr"
+            fi
+        fi
+        ((++count))
+    done
+    echo "$out"
+}
+
+function vm_status {
+    for g in "${ALL_GROUPS[@]}"; do
+        local running
+        ctrl_sock "$g"
+        local ctl="$__ret"
+        if echo "info status" | socat - "UNIX-CONNECT:$ctl" 2>&1 | grep running &> /dev/null; then
+            local SSHstatus
+            SSHstatus=$(admin_status "$g")
+            local interfacesstatus
+            interfacesstatus=$(if_status "$g")
+            running="\n        ${SSHstatus}${interfacesstatus}"
+            if [[ "$running" =~ "\e[31m" ]]; then
+                running="\e[33mRUNNING\e[39m$running"
+            else
+                running="\e[33mRUNNING\e[39m$running"
+            fi
+        else
+            running="\e[31mSTOPPED\e[39m"
+        fi
+        echo -e "[VM $g] $running"
+    done
 }
 
 ###############################################################################
@@ -1095,6 +1201,7 @@ while getopts ":hskdrS:K:D:R:C:-:V:ntB:c:" optchar; do
                 fetch-deps) fetch_deps  ;;
                 shutdown) shutdown_net  ;;
                 hostname) set_hostnames ;;
+                status)   vm_status     ;;
                 *) echo "Unknown option --${OPTARG}" >&2 ;;
             esac;;
         s) start_all_vms       ;;
