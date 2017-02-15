@@ -53,7 +53,8 @@ TAYGAv4="192.168.255.1"
 TAYGAv4RANGE="192.168.255.0/24"
 TAYGADEV="nat64"
 TAYGACHROOT="/tmp/tayga"
-
+# Mac address base for all VM interfaces
+MACBASE="be:ef:de:ad"
 
 ###############################################################################
 ## Provision the VMs
@@ -525,6 +526,7 @@ function start_pop {
     pop_name "$1"
     local br="$__ret"
     ip link add name "$br" type bridge
+    echo -n 0 > /sys/class/net/${br}/bridge/multicast_snooping
     ip link set dev "$br" up
 
     # Connect the master interface to the fabric
@@ -607,6 +609,7 @@ function start_network {
     if ! ip link show dev "$SSHBR"; then
         info "Creating SSH management bridge"
         ip link add name "$SSHBR" type bridge
+        echo -n 0 > /sys/class/net/${SSHBR}/bridge/multicast_snooping
         ip link set dev "$SSHBR" up
         ip link add name "${SSHBR}-in" type veth peer name "${SSHBR}-out"
         ip link set dev "${SSHBR}-out" master "$SSHBR"
@@ -868,8 +871,10 @@ function start_vm {
     vm_admin_if "$1"
     local intf="$__ret"
     setup_ssh_management_port "$1" "$port" "$intf"
+    local macvm
+    printf -v macvm "%02d" "$1"
     CMD+=" -netdev tap,id=fwd${1},script=no,ifname=${intf}"
-    CMD+=" -device e1000,netdev=fwd$1"
+    CMD+=" -device e1000,netdev=fwd$1,mac=${MACBASE}:${macvm}:ff"
 
     local count=0
     interfaces_list "$1"
@@ -892,7 +897,9 @@ function start_vm {
             ip6tables -A FORWARD -i "$i" -j DROP
         fi
         local cid="g${1}c${count}"
-        CMD+=" -device e1000,netdev=${cid}"
+        local cnt
+        printf -v cnt "%02d" "$count"
+        CMD+=" -device e1000,netdev=${cid},mac=${MACBASE}:${macvm}:${cnt}"
         CMD+=" -netdev tap,id=${cid},script=no,ifname=${i}"
         info "Bridging $i on $peer (POP${asn}/$peer)"
         ip link set dev "$i" master "$peer"
