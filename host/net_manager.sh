@@ -211,6 +211,7 @@ auto eth0
 iface eth0 inet6 static
     address $ssh_guest_address
     netmask 64
+    gateway ${SSHBASE}::
 
 # Leave these unnumbered and configure instead the addresses of their bridged
 # Counterparts in the corresponding border routers
@@ -553,7 +554,7 @@ function start_pop {
     sysctl -w "net.ipv6.conf.${1}.forwarding=1"
 
     # Accept incoming related traffic towards the master interface
-    ip6tables -A FORWARD -i eth0 -o "$1" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    ip6tables -A FORWARD -i eth0 -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     # No restrictions on outgoing traffic
     ip6tables -A FORWARD -i "$1" -o eth0 -j ACCEPT
     # Drop any unrelated traffic from the bridge with the POP prefix
@@ -574,7 +575,7 @@ function kill_pop {
     ip6tables -D FORWARD -i "$br" -s "${range}/$((BASELEN+16))" -j ACCEPT
     ip6tables -D FORWARD -i "$br" -d "${range}/$((BASELEN+16))" -j ACCEPT
     ip6tables -D FORWARD -i "$br" -j DROP
-    ip6tables -D FORWARD -i eth0 -o "$1" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    ip6tables -D FORWARD -i eth0 -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     ip6tables -D FORWARD -i "$1" -o eth0 -j ACCEPT
     iptables -D FORWARD -o "$1" -j DROP
     iptables -D FORWARD -i "$1" -j DROP
@@ -601,6 +602,8 @@ function kill_pop {
 
 function start_network {
     info "Starting the host network"
+    sysctl -w "net.ipv6.conf.all.forwarding=1"
+    sysctl -w "net.ipv6.conf.default.forwarding=1"
 
     start_tayga
     start_named
@@ -618,14 +621,11 @@ function start_network {
         ip address add dev "${SSHBR}-in" "${SSHBASE}::/64"
         # Enable IPv6 forwarding towards the management bridge
         sysctl -w "net.ipv6.conf.${SSHBR}-in.forwarding=1"
-        ip6tables -A FORWARD -i eth0 -o "${SSHBR}-in" -j ACCEPT
-        ip6tables -A FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT -m conntrack --ctstate ESTABLISHED,RELATED
-        # We masquerade the source of external traffic as the VM will not have
-        # a route towards it ...
-        ip6tables -t nat -I POSTROUTING ! -s "${SSHBASE}::" -o "${SSHBR}-in" -j SNAT --to-source "${SSHBASE}::"
+        ip6tables -A FORWARD -i eth0 -o "${SSHBR}-in" -m conntrack --ctstate DNAT,RELATED,ESTABLISHED -j ACCEPT
+        ip6tables -A FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT
     fi
 
-    ip6tables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source "$(get_v6)"
+    ip6tables -t nat -A POSTROUTING -o eth0 -s "${NETBASE}::/${BASELEN}" -j SNAT --to-source "$(get_v6)"
     for pop in "${ASN_KEYS[@]}"; do
         start_pop "$pop"
     done
@@ -640,7 +640,7 @@ function kill_network {
     for pop in "${ASN_KEYS[@]}"; do
         kill_pop "$pop"
     done
-    ip6tables -t nat -D POSTROUTING -o eth0 -j SNAT --to-source "$(get_v6)"
+    ip6tables -t nat -D POSTROUTING -o eth0 -s "${NETBASE}::/${BASELEN}" -j SNAT --to-source "$(get_v6)"
 
     # Delete the management bridge
     info "Tearing down SSH management bridge"
@@ -648,9 +648,9 @@ function kill_network {
     ip link del dev "$SSHBR"
     ip link set dev "${SSHBR}-in" down
     ip link del dev "${SSHBR}-in"
-    ip6tables -D FORWARD -i eth0 -o "${SSHBR}-in" -j ACCEPT
-    ip6tables -D FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT -m conntrack --ctstate RELATED,ESTABLISHED
-    ip6tables -t nat -D POSTROUTING ! -s "${SSHBASE}::" -o "${SSHBR}-in" -j SNAT --to-source "${SSHBASE}::"
+
+    ip6tables -D FORWARD -i eth0 -o "${SSHBR}-in" -m conntrack --ctstate DNAT,RELATED,ESTABLISHED -j ACCEPT
+    ip6tables -D FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT
 }
 
 function start_tayga {
@@ -665,10 +665,11 @@ function start_tayga {
     ip link set dev "$TAYGADEV" up
     ip route add "$TAYGAv4RANGE" dev "$TAYGADEV"
     ip route add "${NAT64PREFIX}::/96" dev "$TAYGADEV"
+    ip address add dev "$TAYGADEV" "${NAT64PREFIX}::1"
 
     debg "NATing interface $TAYGADEV"
     iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source "$(get_v4)"
-    iptables -A FORWARD -i eth0 -o "$TAYGADEV" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    iptables -A FORWARD -i eth0 -o "$TAYGADEV" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     iptables -A FORWARD -i "$TAYGADEV" -o eth0 -j ACCEPT
 
     sysctl -w net.ipv4.ip_forward=1
@@ -698,7 +699,7 @@ function stop_tayga {
     debg "Stopped tayga"
 
     iptables -t nat -D POSTROUTING -o eth0 -j SNAT --to-source "$(get_v4)"
-    iptables -D FORWARD -i eth0 -o "$TAYGADEV" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    iptables -D FORWARD -i eth0 -o "$TAYGADEV" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     iptables -D FORWARD -i "$TAYGADEV" -o eth0 -j ACCEPT
     debg "Removed NATing rules for $TAYGADEV"
 
@@ -712,6 +713,7 @@ function stop_tayga {
 function stop_named {
     killall named &> /dev/null
     debg "Stopped named"
+    ip address del dev lo "${NETBASE}::$DNSSUFFIX"
 }
 
 # Start the named daemon
@@ -722,6 +724,7 @@ function start_named {
     fi
     named -c "$NAMEDCONF"
     info "Started named (bind)"
+    ip address add dev lo "${NETBASE}::$DNSSUFFIX"
 }
 
 ###############################################################################
@@ -761,7 +764,7 @@ function _cleanup_vm {
         local as="${ASN_KEYS[$count]}"
         local asn="${BGP_ASN[$as]}"
         local rangebase="${NETBASE}:${asn}"
-        local subnet="${rangebase}:${1}::/$((BASELEN+16))"
+        local subnet="${rangebase}:${1}::/$((BASELEN+32))"
         ip6tables -D FORWARD -i "$i" -s "$subnet" -j ACCEPT
         ip6tables -D FORWARD -i "$i" -s "${rangebase}::$1" -j ACCEPT
         ip6tables -D FORWARD -i "$i" -d "$subnet" -j ACCEPT
@@ -799,9 +802,6 @@ function setup_ssh_management_port {
         # Infer destination IPv6 address from destination port
         # We also rewrite the source IP address (cfr. start_network)
         ip6tables -t nat -A PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
-        # Rewrite source port based on source address, and replace source address
-        # by the public address.
-        ip6tables -t nat -I POSTROUTING -o eth0 -s "${sshtarget}" -p tcp --sport 22 -j SNAT --to-source "[$(get_v6)]:${port}"
     fi
 }
 
@@ -816,7 +816,6 @@ function del_ssh_management_port {
     guest_ssh_address "$1"
     local sshtarget="$__ret"
     ip6tables -t nat -D PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
-    ip6tables -t nat -D POSTROUTING -o eth0 -s "${sshtarget}" -p tcp --sport 22 -j SNAT --to-source "[$(get_v6)]:${port}"
 }
 
 ###############################################################################
@@ -887,7 +886,7 @@ function start_vm {
             debg "Creating TAP interface $i"
             ip tuntap add dev "$i" mode tap
             local rangebase="${NETBASE}:${asn}"
-            local subnet="${rangebase}:${1}::/$((BASELEN+16))"
+            local subnet="${rangebase}:${1}::/$((BASELEN+32))"
             # Drop unrelated traffic (either the BGP traffic, or the delegated
             # prefix)
             ip6tables -A FORWARD -i "$i" -s "$subnet" -j ACCEPT
@@ -1074,7 +1073,8 @@ EOD
 }
 
 function ping_status {
-    if ping6 -c 3 -i 0.2 "$1" | grep '3 received' &> /dev/null; then
+    local cnt=1
+    if ping6 -c "$cnt" -i 0.2 "$1" | grep "${cnt} received" &> /dev/null; then
         echo "ping:ok"
     else
         echo "\e[31mping:down\e[39m"
@@ -1168,7 +1168,7 @@ function vm_status {
             if [[ "$running" =~ "\e[31m" ]]; then
                 running="\e[33mRUNNING\e[39m$running"
             else
-                running="\e[33mRUNNING\e[39m$running"
+                running="\e[32mRUNNING\e[39m$running"
             fi
         else
             running="\e[31mSTOPPED\e[39m"
