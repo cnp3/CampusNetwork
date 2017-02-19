@@ -39,6 +39,7 @@ TCPFWBASE=40000
 NAMEDCONF="${BDIR}/named.conf"
 ZONE_INGI="${BDIR}/db.ingi"
 REVERSE_INGI="${BDIR}/db.${NETBASE}"
+NAMEDPID='named.pid'
 # BGP ASNs
 declare -A BGP_ASN
 BGP_ASN['belneta']=300
@@ -360,7 +361,7 @@ function mk_named_config {
     # Start by creating the ingi zone file
     local zone
     IFS='' read -r -d '' zone << EOD || true
-$TTL    604800
+\$TTL    604800
 @       IN      SOA     ingi. root.ingi. (
                               1         ; Serial
                          604800         ; Refresh
@@ -432,7 +433,7 @@ options {
         dnssec-validation auto;
 
         auth-nxdomain no;    # conform to RFC1035
-        listen-on-v6 { any; };
+        listen-on-v6 { ${BIND_ADDRESS}; };
 
         allow-transfer { none; };
 
@@ -441,6 +442,8 @@ options {
                         known_client;
                 };
         };
+
+        pid-file "${NAMEDPID}";
 };
 
 zone "ingi." {
@@ -510,87 +513,106 @@ function get_v6 {
     ip route get 2001:4860:4860::8888 | head -1 | cut -d' ' -f10
 }
 
-# Return the name of the bridge of a POP
-# $1: pop name
-function pop_name {
-    __ret="br$1"
-}
-
 ###############################################################################
 ## Host network management
 ###############################################################################
+
+# Create a network bridge
+# $1: name
+# $2: address
+# $3: FORWARD chain from eth0 ctstate extra
+# $4: allow traffic from prefix
+function mk_bridge {
+    if ip link sh dev "$1"; then 
+        echo "Bridge $1 already exists"
+        return 0
+    fi
+    ip link add dev "$1" type bridge
+    ip link set dev "$1" up
+
+    echo -n 0 > "/sys/class/net/${1}/bridge/multicast_snooping"
+    sysctl -w "net.ipv6.conf.${1}.disable_ipv6=0"
+    sysctl -w "net.ipv6.conf.${1}.forwarding=1"
+    sysctl -w "net.ipv6.conf.${1}.accept_ra=0"
+    sysctl -w "net.ipv6.conf.${1}.accept_redirects=0"
+
+    # Allow 'debug' icmpv6
+    ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type destination-unreachable -j ACCEPT
+    ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type packet-too-big -j ACCEPT
+    ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type time-exceeded -j ACCEPT
+    ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type neighbor-solicitation -j ACCEPT
+    ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type neighbor-advertisement -j ACCEPT
+    ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type echo-request -j ACCEPT
+    ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type echo-reply -j ACCEPT
+    # Drop the hazardous ones
+    ip6tables -A INPUT -i "$1" -p icmpv6 -j DROP
+    # NAT to the touside v6-native connection
+    ip6tables -A FORWARD -i eth0 -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
+    ip6tables -A FORWARD -i "$1" -o eth0 -j ACCEPT
+    # NAT to the NAT64 interface
+    ip6tables -A FORWARD -i "$TAYGADEV" -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
+    ip6tables -A FORWARD -i "$1" -o "$TAYGADEV" -j ACCEPT
+    # Allow inter-VM traffic with proper source or destination address
+    ip6tables -A FORWARD -i "$1" -s "$4" -j ACCEPT
+    ip6tables -A FORWARD -o "$1" -d "$4" -j ACCEPT
+
+    # Drop IPv4
+    iptables -I FORWARD -o "$1" -j DROP
+    iptables -I FORWARD -i "$1" -j DROP
+
+    ip address add dev "$1" "$2"
+}
+
+# Delete the network bridge
+# $1: name
+# $2: address
+# $3: FORWARD chain from eth0 ctstate extra
+function del_bridge {
+    ip link del dev "$1"
+    ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type destination-unreachable -j ACCEPT
+    ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type packet-too-big -j ACCEPT
+    ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type time-exceeded -j ACCEPT
+    ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type neighbor-solicitation -j ACCEPT
+    ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type neighbor-advertisement -j ACCEPT
+    ip6tables -D INPUT -i "$1" -p icmpv6 -j DROP
+
+    ip6tables -D FORWARD -i eth0 -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
+    ip6tables -D FORWARD -i "$1" -o eth0 -j ACCEPT
+    ip6tables -D FORWARD -i "$TAYGADEV" -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
+    ip6tables -D FORWARD -i "$1" -o "$TAYGADEV" -j ACCEPT
+    ip6tables -D FORWARD -i "$1" -o "$1" -s "$4" -j ACCEPT
+    ip6tables -D FORWARD -i "$1" -o "$1" -d "$4" -j ACCEPT
+
+    # Drop IPv4
+    iptables -D FORWARD -o "$1" -j DROP
+    iptables -D FORWARD -i "$1" -j DROP
+}
 
 # Start on POP: a bridge with a BGP router connected to all VMs
 # $1: pop name
 function start_pop {
     # Create the POP fabric
-    pop_name "$1"
-    local br="$__ret"
-    ip link add name "$br" type bridge
-    echo -n 0 > /sys/class/net/${br}/bridge/multicast_snooping
-    ip link set dev "$br" up
-
-    # Connect the master interface to the fabric
-    local out="${1}-out"
-    ip link add name "$1" type veth peer name "$out"
-    ip link set dev "$out" master "$br"
-    ip link set dev "$out" up
-    ip link set dev "$1" up
-
     local asn="${BGP_ASN[$1]}"
     asn_address "$asn"
     local range="${__ret}"
     # We assign fd00:xxxx::/48 to the bridge, e.g. do not include
-    # peer's domains unless they announce it to us
-    ip address add dev "$1" "${range}/$((BASELEN+32))"
+    # peer's domains unless they announce it to us in the routing table
+    # However allow peer traffic over the bridge
+    # No extra FORWARD iptables rules
+    mk_bridge "$1" "${range}/$((BASELEN+32))" '' "${range}/$((BASELEN+16))"
+    
     mk_bgpd_config "$asn"
-
-    asn_cfg "$asn"
     local cfg="$__ret"
     asn_ctl "$asn"
     bird6 -c "$cfg" -s "$__ret"
-
-    # Enable IPv6 forwarding on the master interface
-    sysctl -w "net.ipv6.conf.${1}.forwarding=1"
-
-    # Accept incoming related traffic towards the master interface
-    ip6tables -A FORWARD -i eth0 -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    # No restrictions on outgoing traffic
-    ip6tables -A FORWARD -i "$1" -o eth0 -j ACCEPT
-    # Drop any unrelated traffic from the bridge with the POP prefix
-    ip6tables -A FORWARD -i "$br" -s "${range}/$((BASELEN+16))" -j ACCEPT
-    ip6tables -A FORWARD -i "$br" -d "${range}/$((BASELEN+16))" -j ACCEPT
-    ip6tables -A FORWARD -i "$br" -j DROP
-    # Block IPv4 traffic on the POP bridge
-    iptables -I FORWARD -o "$br" -j DROP
-    iptables -I FORWARD -i "$br" -j DROP
 }
 
 function kill_pop {
-    # Invert all iptables rules
-    pop_name "$1"
-    local br="$__ret"
-    asn_address "${BGP_ASN[$1]}"
-    local range="${__ret}"
-    ip6tables -D FORWARD -i "$br" -s "${range}/$((BASELEN+16))" -j ACCEPT
-    ip6tables -D FORWARD -i "$br" -d "${range}/$((BASELEN+16))" -j ACCEPT
-    ip6tables -D FORWARD -i "$br" -j DROP
-    ip6tables -D FORWARD -i eth0 -o "$1" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    ip6tables -D FORWARD -i "$1" -o eth0 -j ACCEPT
-    iptables -D FORWARD -o "$1" -j DROP
-    iptables -D FORWARD -i "$1" -j DROP
-
-    sysctl -w "net.ipv6.conf.${1}.forwarding=0"
-
-    # Remove the master interface
-    ip link set dev "$1" down
-    ip link del dev "$1"
-
-    # Remove the brige
-    ip link set dev "$br" down
-    ip link del dev "$br"
-
     local asn="${BGP_ASN[$1]}"
+    asn_address "$asn"
+    local range="${__ret}"
+    del_bridge "$1" "${range}/$((BASELEN+32))" '' "${range}/$((BASELEN+16))"
+
     # Tell BIRD to stop
     asn_ctl "$asn"
     debg "Killing BIRD for ${1}/$__ret"
@@ -602,8 +624,6 @@ function kill_pop {
 
 function start_network {
     info "Starting the host network"
-    sysctl -w "net.ipv6.conf.all.forwarding=1"
-    sysctl -w "net.ipv6.conf.default.forwarding=1"
 
     start_tayga
     start_named
@@ -611,21 +631,12 @@ function start_network {
     # Create the SSH management bridge
     if ! ip link show dev "$SSHBR"; then
         info "Creating SSH management bridge"
-        ip link add name "$SSHBR" type bridge
-        echo -n 0 > /sys/class/net/${SSHBR}/bridge/multicast_snooping
-        ip link set dev "$SSHBR" up
-        ip link add name "${SSHBR}-in" type veth peer name "${SSHBR}-out"
-        ip link set dev "${SSHBR}-out" master "$SSHBR"
-        ip link set dev "${SSHBR}-out" up
-        ip link set dev "${SSHBR}-in" up
-        ip address add dev "${SSHBR}-in" "${SSHBASE}::/64"
-        # Enable IPv6 forwarding towards the management bridge
-        sysctl -w "net.ipv6.conf.${SSHBR}-in.forwarding=1"
-        ip6tables -A FORWARD -i eth0 -o "${SSHBR}-in" -m conntrack --ctstate DNAT,RELATED,ESTABLISHED -j ACCEPT
-        ip6tables -A FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT
+        mk_bridge "$SSHBR" "${SSHBASE}::/64" ",DNAT" "${SSHBASE}::/64"
     fi
 
     ip6tables -t nat -A POSTROUTING -o eth0 -s "${NETBASE}::/${BASELEN}" -j SNAT --to-source "$(get_v6)"
+    ip6tables -P FORWARD DROP
+
     for pop in "${ASN_KEYS[@]}"; do
         start_pop "$pop"
     done
@@ -644,13 +655,7 @@ function kill_network {
 
     # Delete the management bridge
     info "Tearing down SSH management bridge"
-    ip link set dev "$SSHBR" down
-    ip link del dev "$SSHBR"
-    ip link set dev "${SSHBR}-in" down
-    ip link del dev "${SSHBR}-in"
-
-    ip6tables -D FORWARD -i eth0 -o "${SSHBR}-in" -m conntrack --ctstate DNAT,RELATED,ESTABLISHED -j ACCEPT
-    ip6tables -D FORWARD -o eth0 -i "${SSHBR}-in" -j ACCEPT
+    del_bridge "$SSHBR" "${SSHBASE}::/64" ",DNAT" "${SSHBASE}::/64"
 }
 
 function start_tayga {
@@ -713,7 +718,7 @@ function stop_tayga {
 function stop_named {
     killall named &> /dev/null
     debg "Stopped named"
-    ip address del dev lo "${NETBASE}::$DNSSUFFIX"
+    ip address del dev lo "$BIND_ADDRESS"
 }
 
 # Start the named daemon
@@ -722,9 +727,10 @@ function start_named {
     if [[ ! -e "$ZONE_INGI" || ! -e "$REVERSE_INGI" || ! -e "$NAMEDCONF" ]]; then
         mk_named_config
     fi
+    # Make DNS resolver address bindable and pingable
+    ip address add dev lo "$BIND_ADDRESS"
     named -c "$NAMEDCONF"
     info "Started named (bind)"
-    ip address add dev lo "${NETBASE}::$DNSSUFFIX"
 }
 
 ###############################################################################
@@ -836,6 +842,7 @@ function start_all_vms {
         start_vm "$g"
     done
     info "Waiting for the VM to boot"
+    sleep 10
     set_hostnames
 }
 
@@ -879,8 +886,6 @@ function start_vm {
     interfaces_list "$1"
     for i in "${__ret_array[@]}"; do
         local as="${ASN_KEYS[$count]}"
-        pop_name "$as"
-        local peer="$__ret"
         local asn="${BGP_ASN[$as]}"
         if ! ip l sh dev "$i" ; then
             debg "Creating TAP interface $i"
@@ -900,8 +905,8 @@ function start_vm {
         printf -v cnt "%02d" "$count"
         CMD+=" -device e1000,netdev=${cid},mac=${MACBASE}:${macvm}:${cnt}"
         CMD+=" -netdev tap,id=${cid},script=no,ifname=${i}"
-        info "Bridging $i on $peer (POP${asn}/$peer)"
-        ip link set dev "$i" master "$peer"
+        info "Bridging $i on $as (POP${asn}/$as)"
+        ip link set dev "$i" master "$as"
         ip link set dev "$i" up
         ((++count))
     done
@@ -1024,7 +1029,7 @@ function asn_cli {
 function shutdown_net {
     kill_all_vms
     sleep "$DESTROYDELAY"
-    killall "$QEMU"
+    killall "$QEMU" &> /dev/null
     sleep 2
     for i in $(seq 10); do
         for j in e0 e1 ssh; do
@@ -1129,10 +1134,8 @@ function if_status {
     for i in "${__ret_array[@]}"; do
         out+="\n        "
         local as="${ASN_KEYS[$count]}"
-        pop_name "$as"
-        local peer="$__ret"
         local asn="${BGP_ASN[$as]}"
-        local heading="${peer}/POP${asn}"
+        local heading="${as}/POP${asn}"
         if ! ip link sh dev "$i" | grep UP &> /dev/null; then
             out+="\e[31m${heading}{${i},status:down}\e[39m"
         else
