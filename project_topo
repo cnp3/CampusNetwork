@@ -12,7 +12,7 @@ PREFIXB="fd00:300:${GROUPNUMBER}::/48"
 # This function describes the network topology that we want to emulate
 function mk_topo {
     echo "@@ Adding links and nodes"
-    add_link MICH SH1CA # mich-eth0 sh1c-eth0
+    add_link MICH SH1C # mich-eth0 sh1c-eth0
     add_link SH1C HALL  # sh1c-eth1 hall-eth0 
     add_link HALL PYTH  # hall-eth1 pyth-eth0
     add_link STEV PYTH  # stev-eth0 pyth-eth1
@@ -30,8 +30,8 @@ function mk_topo {
 
 
     echo "@@ Briding the network"
-    bridge_node HALL eth2 belneta
-    bridge_node PYTH eth1 belnetb
+    bridge_node HALL eth1 belneta
+    bridge_node PYTH eth2 belnetb
     # We likely want to have redundant connections to our 2 providers
     # bridge_node HALL eth1 HALL-belnetb
     # bridge_node PYTH eth2 HALL-belneta

@@ -574,6 +574,8 @@ function del_bridge {
     ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type time-exceeded -j ACCEPT
     ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type neighbor-solicitation -j ACCEPT
     ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type neighbor-advertisement -j ACCEPT
+    ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type echo-request -j ACCEPT
+    ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type echo-reply -j ACCEPT
     ip6tables -D INPUT -i "$1" -p icmpv6 -j DROP
 
     ip6tables -D FORWARD -i eth0 -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
