@@ -582,8 +582,8 @@ function del_bridge {
     ip6tables -D FORWARD -i "$1" -o eth0 -j ACCEPT
     ip6tables -D FORWARD -i "$TAYGADEV" -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
     ip6tables -D FORWARD -i "$1" -o "$TAYGADEV" -j ACCEPT
-    ip6tables -D FORWARD -i "$1" -o "$1" -s "$4" -j ACCEPT
-    ip6tables -D FORWARD -i "$1" -o "$1" -d "$4" -j ACCEPT
+    ip6tables -D FORWARD -o "$1" -s "$4" -j ACCEPT
+    ip6tables -D FORWARD -i "$1" -d "$4" -j ACCEPT
 
     # Drop IPv4
     iptables -D FORWARD -o "$1" -j DROP
