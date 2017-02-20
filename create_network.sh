@@ -132,14 +132,16 @@ function _attach_to_LAN_named {
 # Attach a LAN to a given node
 # $1: node name
 function add_LAN {
-    local LAN="lan${LANCOUNT[$1]}"
     next_LAN "$1"
-    local src="$__ret"
+    local LAN="$__ret"
     # Create a brdige in the node NS
     ip netns exec "$1" ip link add name "$LAN" type bridge
     # Bring the bridge up
     ip netns exec "$1" ip link set dev "$LAN" up
-    _attach_to_LAN_named "$LAN" "$1" "$1" "$src" "${LAN}-in"
+    # Enable IPv6 numbering of the bridge
+    ip netns exec "$1" sysctl -w "net.ipv6.conf.${LAN}.disable_ipv6=0"
+    # Force Multicast forwarding on
+    ip netns exec "$1" bash -c "echo -n 0 > /sys/class/net/${LAN}/bridge/multicast_snooping"
     __ret="$LAN"
 }
 
