@@ -35,5 +35,17 @@ function mk_topo {
     # We likely want to have redundant connections to our 2 providers
     # bridge_node HALL eth1 HALL-belnetb
     # bridge_node PYTH eth2 HALL-belneta
+    # We can add a test host 'outside of the network':
+    # mk_node test300
+    # bridge_node HALL eth1 test300
+    # mk_node test200
+    # bridge_node PYTH eth2 test200
+    # These hosts will sit next to belneta and thus could be used to simulate
+    # external inbound traffic sources. Make sure to set routes on
+    # them, i.e. in test300_start, 
+    # (i) Assign an address: ip address add dev test300 fd00:300:255::${GROUPNUMBER}/64
+    # (ii) Add a default route: ip route add ::/0 via fd00:300::b
+    # (iii) Add a route towards your network:
+    # ip route add fd00:300:${GROUPNUMBER}::/48 via fd00:300::${GROUPNUMBER}
 }
 
