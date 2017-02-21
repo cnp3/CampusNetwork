@@ -1202,14 +1202,9 @@ function dump_bgp {
     local fname
     local show_proto
     local show_route
-    while "true"; do
-        for asn in "${BGP_ASN[@]}"; do
-            asn_ctl "$asn"
-            ctl="$__ret"
-            fname="as${asn}.status"
-            show_proto=$(echo "show protocol all" | birdc6 -s "$ctl")
-            show_route=$(echo "show route all" | birdc6 -s "$ctl")
-            cat << EOD > "$fname"
+    local page
+    local head
+    IFS='' read -r -d '' head << EOD
 <html><head><style>
 body{
   font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -1228,12 +1223,42 @@ h1, h2{
 h1 {
   font-size: 2.5rem;
   margin-top: 3rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 h2 {
   font-size: 2rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
+}
+
+ul {
+  list-style-type: none;
+  font-size: .75rem;
+}
+
+a, a:visited, a:active, a:hover {
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  font-style: inherit;
+  text-decoration: inherit;
+}
+
+li {
+  background-color: #d5d5d5;
+  border-radius: .25rem;
+  padding: .25rem;
+  margin: .25rem;
+  color: black;
+}
+
+li:hover {
+  background-color: #c0c0c0;
+}
+
+.sep {
+  background-color: inherit;
+  margin-bottom: .25rem;
 }
 
 .menu {
@@ -1242,10 +1267,9 @@ h2 {
   top: 0;
   margin: 2rem;
   padding: 2rem;
-  background-color: #f0f0f0;
 }
 
-.dump {
+code {
   padding: 0.25rem;
   background-color: #f0f0f0;
   border: 1px solid #ddd;
@@ -1255,34 +1279,60 @@ h2 {
   height: auto;
   font-family: "Courier New", Courier, monospace;
   color: inherit;
-}
-
-hr{
-  border: 0;
-  height: 1px;
-  background: #ddd;
-  margin: 1rem 0;
+  margin-top: 2rem;
 }
 </style></head><body>
-    <h1 id="top">Dump of <strong>ASN${asn}</strong> at $(date)</h1>
-    <div class="menu">
-        <a href="#proto">show protocol all</a></br>
-        <a href="#route">show route all</a></br>
+EOD
+    while "true"; do
+        for asn in "${BGP_ASN[@]}"; do
+            asn_ctl "$asn"
+            ctl="$__ret"
+            fname="as${asn}.status"
+            IFS='' read -r -d '' page << EOD || true
+${head}
+  <h1 id="top">Dump of <strong>ASN${asn}</strong> at $(date)</h1>
+    <ul class="menu">
+EOD
+            for g in "${ALL_GROUPS[@]}"; do
+                IFS='' read -r -d '' __ret << EOD || true
+      <li><a href="#proto_g${g}">Group ${g} BGP session statistics</a></li>
+      <li><a href="#route_g${g}">Routes received from Group ${g}</a></li>
+      <li class="sep"></li>
+EOD
+                page+="$__ret"
+            done
+            IFS='' read -r -d '' __ret << EOD || true
+      <li><a href="#proto">Show all protocol statistics</a></li>
+      <li><a href="#route">Show all routes</a></li>
+    </ul>
+EOD
+            page+="$__ret"
+            for g in "${ALL_GROUPS[@]}"; do
+                IFS='' read -r -d '' __ret << EOD || true
+    <div id="proto_g${g}">
+        <h2>Group ${g} BGP session statistics</h2>
+        <pre><code>$(echo "show proto all group${g}" | birdc6 -s "$ctl")</code></pre>
     </div>
-    </br></hr></br>
-    <div id="proto" class="dump">
-        <h2>show protocol all</h2></br>
-        <pre><code>${show_proto}</code></pre>
+    <div id="route_g${g}">
+        <h2>Routes received from Group ${g}</h2>
+        <pre><code>$(echo "show route all protocol group${g}" | birdc6 -s "$ctl")</code></pre>
     </div>
-    </br></hr></br>
-    <div id="route" class="dump"></br>
-        <h2>show route all</h2>
-        <pre><code>${show_route}<pre><code>
+EOD
+                page+="$__ret"
+            done
+            IFS='' read -r -d '' __ret << EOD || true
+    <div id="proto">
+        <h2>Show all protocol statistics</h2>
+        <pre><code>$(echo "show proto all" | birdc6 -s "$ctl")</code></pre>
     </div>
-    </br></hr></br>
-    <a href="#top">Back to top.</a>
+    <div id="route">
+        <h2>Show all routes</h2>
+        <pre><code>$(echo "show route all" | birdc6 -s "$ctl")</code></pre>
+    </div>
 </body></html>
 EOD
+        page+="$__ret"
+        echo "$page" > "$fname"
         done
         sleep 5;
     done
