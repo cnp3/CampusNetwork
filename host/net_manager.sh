@@ -791,6 +791,11 @@ function _cleanup_vm {
     unlink "$__ret"
 }
 
+function mk_tuntap {
+    ip tuntap add dev "$1" mode tap
+    sysctl -w "net.ipv6.conf.${1}.forwarding=1"
+}
+
 # Create an initialize the management port for the VM
 # $1: group number
 # $2: port
@@ -800,9 +805,9 @@ function setup_ssh_management_port {
     local intf="$3"
     if ! ip l sh dev "$intf"; then
         debg "Creating TAP interface $intf for SSH access to the VM"
-        ip tuntap add dev "$intf" mode tap
+        mk_tuntap "$SSHBR"
         ip l set dev "$intf" master "$SSHBR"
-        ip l set dev "$intf" up
+        ip l set dev "$SSHBR" up 
 
         guest_ssh_address "$1"
         local sshtarget="$__ret"
@@ -892,7 +897,7 @@ function start_vm {
         local asn="${BGP_ASN[$as]}"
         if ! ip l sh dev "$i" ; then
             debg "Creating TAP interface $i"
-            ip tuntap add dev "$i" mode tap
+            mk_tuntap "$i"
             local rangebase="${NETBASE}:${asn}"
             local subnet="${rangebase}:${1}::/$((BASELEN+32))"
             # Drop unrelated traffic (either the BGP traffic, or the delegated
