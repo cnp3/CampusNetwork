@@ -663,6 +663,28 @@ function start_network {
     for pop in "${ASN_KEYS[@]}"; do
         start_pop "$pop"
     done
+
+    start_looking_glass
+}
+
+function start_looking_glass {
+    "${BDIR}/net_manager.sh" --dump-bgp &
+    echo "$!" > dump.pid
+    for asn in "${BGP_ASN[@]}"; do
+        asn_address "$asn"
+        python looking_glass.py "$__ret" "as${asn}.status" &> "looking_glass${asn}.log" &
+        echo "$!" > "as${asn}_looking_glass.pid"
+    done
+}
+
+function stop_looking_glass {
+    kill -s 9 "$(cat dump.pid)"
+    unlink dump.pid
+    for asn in "${BGP_ASN[@]}"; do
+        kill -s 9 "$(cat as${asn}_looking_glass.pid)"
+        unlink "as${asn}_looking_glass.pid"
+        unlink "as${asn}.status"
+    done
 }
 
 function kill_network {
@@ -679,6 +701,8 @@ function kill_network {
     # Delete the management bridge
     info "Tearing down SSH management bridge"
     del_bridge "$SSHBR" "${SSHBASE}::/64" ",DNAT" "${SSHBASE}::/64"
+
+    stop_looking_glass
 }
 
 function start_tayga {
@@ -1173,6 +1197,97 @@ function vm_status {
     done
 }
 
+function dump_bgp {
+    local ctl
+    local fname
+    local show_proto
+    local show_route
+    while "true"; do
+        for asn in "${BGP_ASN[@]}"; do
+            asn_ctl "$asn"
+            ctl="$__ret"
+            fname="as${asn}.status"
+            show_proto=$(echo "show protocol all" | birdc6 -s "$ctl")
+            show_route=$(echo "show route all" | birdc6 -s "$ctl")
+            cat << EOD > "$fname"
+<html><head><style>
+body{
+  font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #373a3c;
+}
+
+h1, h2{
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+  color: inherit;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.menu {
+  position: fixed;
+  right: 0;
+  top: 0;
+  margin: 2rem;
+  padding: 2rem;
+  background-color: #f0f0f0;
+}
+
+.dump {
+  padding: 0.25rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  font-family: "Courier New", Courier, monospace;
+  color: inherit;
+}
+
+hr{
+  border: 0;
+  height: 1px;
+  background: #ddd;
+  margin: 1rem 0;
+}
+</style></head><body>
+    <h1 id="top">Dump of <strong>ASN${asn}</strong> at $(date)</h1>
+    <div class="menu">
+        <a href="#proto">show protocol all</a></br>
+        <a href="#route">show route all</a></br>
+    </div>
+    </br></hr></br>
+    <div id="proto" class="dump">
+        <h2>show protocol all</h2></br>
+        <pre><code>${show_proto}</code></pre>
+    </div>
+    </br></hr></br>
+    <div id="route" class="dump"></br>
+        <h2>show route all</h2>
+        <pre><code>${show_route}<pre><code>
+    </div>
+    </br></hr></br>
+    <a href="#top">Back to top.</a>
+</body></html>
+EOD
+        done
+        sleep 5;
+    done
+}
+
 function print_help {
     IFS='' read -r -d '' msg << EOD || true
 Usage: $0 {action} [param] where {action} is one of
@@ -1195,6 +1310,7 @@ Usage: $0 {action} [param] where {action} is one of
     -t/--tayga      (Re)start the tayga NAT64 daemon
     -B [ASN]        Connect to the router CLI of [ASN]
     --restart-bird  Restart the BGP peering servers
+    --dump_bgp      Dump the BGP status of the peers
 
     -C [group]      Open an SSH connection to the VM of [group] as root
     -c [group]      Open an SSH connection to the VM of [group] as user 'vagrant'
@@ -1235,6 +1351,7 @@ while getopts ":hskdrS:K:D:R:C:-:V:ntB:c:" optchar; do
                 hostname) set_hostnames ;;
                 status)   vm_status     ;;
                 restart-bird) restart_bgp;;
+                dump-bgp) dump_bgp      ;;
                 *) echo "Unknown option --${OPTARG}" >&2 ;;
             esac;;
         s) start_all_vms       ;;
