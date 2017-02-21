@@ -537,6 +537,8 @@ function mk_bridge {
     sysctl -w "net.ipv6.conf.${1}.accept_ra=0"
     sysctl -w "net.ipv6.conf.${1}.accept_redirects=0"
 
+    ip address add dev "$1" "$2"
+
     # Allow 'debug' icmpv6
     ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type destination-unreachable -j ACCEPT
     ip6tables -A INPUT -i "$1" -p icmpv6 --icmpv6-type packet-too-big -j ACCEPT
@@ -560,8 +562,6 @@ function mk_bridge {
     # Drop IPv4
     iptables -I FORWARD -o "$1" -j DROP
     iptables -I FORWARD -i "$1" -j DROP
-
-    ip address add dev "$1" "$2"
 }
 
 # Delete the network bridge
@@ -603,11 +603,34 @@ function start_pop {
     # However allow peer traffic over the bridge
     # No extra FORWARD iptables rules
     mk_bridge "$1" "${range}/$((BASELEN+32))" '' "${range}/$((BASELEN+16))"
-    
+    sleep .3 
+    start_bgp "$asn"
+}
+
+# Start bird6 on a given POP
+# $1: pop asn
+function start_bgp {
     mk_bgpd_config "$asn"
+    # asn_cfg "$1" ## Implicitely done in mk_bgpd_config
     local cfg="$__ret"
-    asn_ctl "$asn"
+    asn_ctl "$1"
     bird6 -c "$cfg" -s "$__ret"
+}
+
+# Stop bird6 on given POP
+# $1: asn
+function stop_bgp {
+    asn_ctl "$1"
+    echo "down" | birdc6 -s "$__ret"
+}
+
+function restart_bgp {
+    for asn in "${BGP_ASN[@]}"; do
+        stop_bgp "$asn"
+    done
+    for asn in "${BGP_ASN[@]}"; do
+        start_bgp "$asn"
+    done
 }
 
 function kill_pop {
@@ -616,10 +639,7 @@ function kill_pop {
     local range="${__ret}"
     del_bridge "$1" "${range}/$((BASELEN+32))" '' "${range}/$((BASELEN+16))"
 
-    # Tell BIRD to stop
-    asn_ctl "$asn"
-    debg "Killing BIRD for ${1}/$__ret"
-    echo "down" | birdc6 -s "$__ret"
+    stop_bgp "$asn"
 
     asn_cfg "$asn"
     rm "$__ret"
@@ -1050,41 +1070,6 @@ function shutdown_net {
     ip6tables -F -t nat
 }
 
-function print_help {
-    IFS='' read -r -d '' msg << EOD || true
-Usage: $0 {action} [param] where {action} is one of
-
-    -s/--start      Start all VMs, the BGP daemons, DNS resolver, and bridge them
-    -S [group]      Start the VM of [group]
-
-    -k/--kill       Stop all VMs, and services
-    -K [group]      Stop the VM of [group]
-    --shutdown      Stop all VMs and destroy the network
-    --hostname      Sets all hostnames in the network
-
-    -r/--restart    Restart the whole network
-    -R [group]      Restart the VM of [group]
-
-    -d/--destroy    Stop and destroy the network VMs
-    -D [group]      Stop and destroy the VM of [group]
-
-    -n/--named      (Re)start the named daemon
-    -t/--tayga      (Re)start the tayga NAT64 daemon
-    -B [ASN]        Connect to the router CLI of [ASN]
-
-    -C [group]      Open an SSH connection to the VM of [group] as root
-    -c [group]      Open an SSH connection to the VM of [group] as user 'vagrant'
-
-    -V [level]      Set log verbosity level (higher means less verbose, [0-3])
-    -h/--help       Display this message
-
-    --status        Print the status of each VM
-
-    --fetch-deps    Install the required dependencies to run this script
-EOD
-    echo "$msg" >&2
-}
-
 function ping_status {
     local cnt=1
     if ping6 -c "$cnt" -i 0.2 "$1" | grep "${cnt} received" &> /dev/null; then
@@ -1188,6 +1173,42 @@ function vm_status {
     done
 }
 
+function print_help {
+    IFS='' read -r -d '' msg << EOD || true
+Usage: $0 {action} [param] where {action} is one of
+
+    -s/--start      Start all VMs, the BGP daemons, DNS resolver, and bridge them
+    -S [group]      Start the VM of [group]
+
+    -k/--kill       Stop all VMs, and services
+    -K [group]      Stop the VM of [group]
+    --shutdown      Stop all VMs and destroy the network
+    --hostname      Sets all hostnames in the network
+
+    -r/--restart    Restart the whole network
+    -R [group]      Restart the VM of [group]
+
+    -d/--destroy    Stop and destroy the network VMs
+    -D [group]      Stop and destroy the VM of [group]
+
+    -n/--named      (Re)start the named daemon
+    -t/--tayga      (Re)start the tayga NAT64 daemon
+    -B [ASN]        Connect to the router CLI of [ASN]
+    --restart-bird  Restart the BGP peering servers
+
+    -C [group]      Open an SSH connection to the VM of [group] as root
+    -c [group]      Open an SSH connection to the VM of [group] as user 'vagrant'
+
+    -V [level]      Set log verbosity level (higher means less verbose, [0-3])
+    -h/--help       Display this message
+
+    --status        Print the status of each VM
+
+    --fetch-deps    Install the required dependencies to run this script
+EOD
+    echo "$msg" >&2
+}
+
 ###############################################################################
 ## main()
 ###############################################################################
@@ -1213,6 +1234,7 @@ while getopts ":hskdrS:K:D:R:C:-:V:ntB:c:" optchar; do
                 shutdown) shutdown_net  ;;
                 hostname) set_hostnames ;;
                 status)   vm_status     ;;
+                restart-bird) restart_bgp;;
                 *) echo "Unknown option --${OPTARG}" >&2 ;;
             esac;;
         s) start_all_vms       ;;
