@@ -43,9 +43,24 @@ function mk_topo {
     # These hosts will sit next to belneta and thus could be used to simulate
     # external inbound traffic sources. Make sure to set routes on
     # them, i.e. in test300_start, 
-    # (i) Assign an address: ip address add dev test300 fd00:300:255::${GROUPNUMBER}/64
+    # (i) Assign an address: ip address add dev test300 fd00:300::${GROUPNUMBER}:255/64
     # (ii) Add a default route: ip route add ::/0 via fd00:300::b
     # (iii) Add a route towards your network:
     # ip route add fd00:300:${GROUPNUMBER}::/48 via fd00:300::${GROUPNUMBER}
+
+    echo "@@ Making the virtual network reachable from the host machine"
+    # Enable IPv6 forwarding on the bridges
+    sysctl -w net.ipv6.conf.breth1.forwarding=1
+    sysctl -w net.ipv6.conf.breth2.forwarding=1
+    # Add (hopefully) unique source addresses on the bridge
+    ip address add dev breth1 "fd00:300::${GROUPNUMBER}:1/64"
+    ip address add dev breth2 "fd00:200::${GROUPNUMBER}:1/64"
+    # Route the vitual network prefixes over the bridges
+    ip route add "$PREFIXB" via "fd00:300::${GROUPNUMBER}"
+    ip route add "$PREFIXA" via "fd00:200::${GROUPNUMBER}"
+    ### Provided the internal routing of your network is correct and has converged:
+    ## You should now be able to ping your virtual network hosts
+    ## connect to the ssh servers, use their FQDN if the DNS are configured
+    ## properly, ...
 }
 
