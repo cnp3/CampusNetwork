@@ -23,6 +23,7 @@ BASELEN=16
 # Store this script location
 _dname=$(dirname "$0")
 BDIR=$(cd "$_dname"; pwd -P)
+cd "$BDIR"
 # The provisioning script run by Vagrant
 PROVISION_SCRIPT=provision.sh
 # The IPv6 suffix of BGP servers
