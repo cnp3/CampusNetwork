@@ -45,6 +45,8 @@ NAMEDPID='named.pid'
 declare -A BGP_ASN
 BGP_ASN['belneta']=300
 BGP_ASN['belnetb']=200
+BIRDCTL="bird6.ctl"
+BIRDCFG="bird6.conf"
 # Return the ASN keys in a sorted fashion
 ASN_KEYS=($(echo "${!BGP_ASN[@]}" | tr " " "\n" | sort | tr "\n" " "))
 # NAT64 prefix
@@ -290,34 +292,20 @@ function vm_admin_if {
 ###############################################################################
 
 
-# BGP ASN config name
-# $1: ASN
-function asn_cfg {
-    __ret="bgp_as${1}.conf"
-}
-
-function asn_ctl {
-    __ret="as${1}.ctl"
-}
-
-
 # Return the IPv6 address of a BGP peer for given ASN
 # $1: ASN
 function asn_address {
     __ret="${NETBASE}:${1}::${BGPSUFFIX}"
 }
 
-# Output a BGP config for one of the two providers
-# $1: ASN
+# Output a BGP config with a dedicated routing table for each providers
 function mk_bgpd_config {
-    asn_address "$1"
-    local src="$__ret"
-    local neigh
-    IFS='' read -r -d '' neigh << EOD || true
-router id 192.0.0.${1:0:1};
-listen bgp address ${src} port 179;
+    local src
+    local cfg
+    IFS='' read -r -d '' cfg << EOD || true
+router id 10.0.0.0;
 
-protocol kernel {
+protocol kernel kernel_rt {
     export all;
     import all;
     learn;
@@ -334,15 +322,31 @@ filter only_kernel_routes {
 }
 
 EOD
-    for g in "${ALL_GROUPS[@]}"; do
+    for asn in "${BGP_ASN[@]}"; do
+        asn_address "$asn"
+        src="$__ret"
         IFS='' read -r -d '' __ret << EOD || true
-protocol bgp group${g} {
-    local as ${1};
-    neighbor ${NETBASE}:${1}::${g} as ${g};
+table as${asn};
+protocol pipe pipe_as${asn} {
+    mode transparent;
+    table as${asn};
+    peer table master;
+    import where proto = "kernel_rt";
+    export all;
+}
+
+EOD
+        cfg+="$__ret"
+        for g in "${ALL_GROUPS[@]}"; do
+            IFS='' read -r -d '' __ret << EOD || true
+protocol bgp as${asn}_group${g} {
+    table as${asn};
+    local as ${asn};
+    neighbor ${NETBASE}:${asn}::${g} as ${g};
     source address ${src};
     next hop self;
     import filter {
-        if net ~ ${NETBASE}:${1}:${g}::/$((BASELEN+32)) then
+        if net ~ ${NETBASE}:${asn}:${g}::/$((BASELEN+32)) then
             accept;
         reject;
     };
@@ -350,11 +354,11 @@ protocol bgp group${g} {
 }
 
 EOD
-        neigh+="$__ret"
+            cfg+="$__ret"
+        done
     done
 
-    asn_cfg "$1"
-    echo "$neigh" > "$__ret"
+    echo "$cfg" > "$BIRDCFG"
 }
 
 # Generate the configuration files for named
@@ -603,34 +607,23 @@ function start_pop {
     # However allow peer traffic over the bridge
     # No extra FORWARD iptables rules
     mk_bridge "$1" "${range}/$((BASELEN+32))" '' "${range}/$((BASELEN+16))"
-    sleep .3 
-    start_bgp "$asn"
 }
 
-# Start bird6 on a given POP
-# $1: pop asn
+# Start bird6
 function start_bgp {
-    mk_bgpd_config "$asn"
-    # asn_cfg "$1" ## Implicitely done in mk_bgpd_config
-    local cfg="$__ret"
-    asn_ctl "$1"
-    bird6 -c "$cfg" -s "$__ret"
+    mk_bgpd_config
+    bird6 -c "$BIRDCFG" -s "$BIRDCTL"
 }
 
-# Stop bird6 on given POP
-# $1: asn
+# Stop bird6
 function stop_bgp {
-    asn_ctl "$1"
-    echo "down" | birdc6 -s "$__ret"
+    echo "down" | birdc6 -s "$BIRDCTL"
+    unlink "$BIRDCFG"
 }
 
 function restart_bgp {
-    for asn in "${BGP_ASN[@]}"; do
-        stop_bgp "$asn"
-    done
-    for asn in "${BGP_ASN[@]}"; do
-        start_bgp "$asn"
-    done
+    stop_bgp
+    start_bgp
 }
 
 function kill_pop {
@@ -638,11 +631,6 @@ function kill_pop {
     asn_address "$asn"
     local range="${__ret}"
     del_bridge "$1" "${range}/$((BASELEN+32))" '' "${range}/$((BASELEN+16))"
-
-    stop_bgp "$asn"
-
-    asn_cfg "$asn"
-    rm "$__ret"
 }
 
 function start_network {
@@ -664,6 +652,7 @@ function start_network {
         start_pop "$pop"
     done
 
+    start_bgp
     start_looking_glass
 }
 
@@ -702,6 +691,7 @@ function kill_network {
     info "Tearing down SSH management bridge"
     del_bridge "$SSHBR" "${SSHBASE}::/64" ",DNAT" "${SSHBASE}::/64"
 
+    stop_bgp
     stop_looking_glass
 }
 
@@ -1068,14 +1058,8 @@ function fetch_deps {
 }
 
 function asn_cli {
-    if [ "${BGP_ASN[$1]+isset}" ]; then
-        asn="${BGP_ASN[$1]}"
-    else
-        warn "Treating '$1' as ASN"
-    fi
-    asn_ctl "$1"
-    debg "Connecting to birdc6 through control socket $__ret"
-    birdc6 -s "$__ret"
+    debg "Connecting to birdc6 through control socket $BIRDCTL"
+    birdc6 -s "$BIRDCTL"
 }
 
 function shutdown_net {
@@ -1134,12 +1118,11 @@ function admin_status {
 }
 
 function bgp_status {
-    asn_ctl "$1"
-    if [ !  -e "$__ret" ]; then
+    if [ !  -e "$BIRDCTL" ]; then
         echo "\e[31mbgp:POP${1}-down\e[39m"
     else
         local statuscode
-        statuscode=$(echo "sh prot" | birdc6 -s "$__ret" | grep "$2 " | sed 's/.*master[ ]*[^ ]*[ ]*[^ ]*[ ]*\([^ ]*\).*/\1/')
+        statuscode=$(echo "sh prot" | birdc6 -s "$BIRDCTL" | grep "$2 " | sed "s/.*as${asn}[ ]*[^ ]*[ ]*[^ ]*[ ]*\([^ ]*\).*/\1/")
         echo "bgp:${statuscode}"
     fi
 }
@@ -1160,7 +1143,7 @@ function if_status {
             local pingres
             pingres=$(ping_status "$addr")
             local bgpres
-            bgpres=$(bgp_status "$asn" "group$1")
+            bgpres=$(bgp_status "$asn" "as${asn}_group$1")
             local statuscurr="{${i}@${addr}, status:up, ${pingres}, ${bgpres}}"
             if [[ "$statuscurr"  =~ "\e[31m" ]]; then
                 out+="${heading} $statuscurr"
@@ -1200,8 +1183,6 @@ function vm_status {
 function dump_bgp {
     local ctl
     local fname
-    local show_proto
-    local show_route
     local page
     local head
     IFS='' read -r -d '' head << EOD
@@ -1285,8 +1266,6 @@ code {
 EOD
     while "true"; do
         for asn in "${BGP_ASN[@]}"; do
-            asn_ctl "$asn"
-            ctl="$__ret"
             fname="as${asn}.status"
             IFS='' read -r -d '' page << EOD || true
 ${head}
@@ -1302,7 +1281,6 @@ EOD
                 page+="$__ret"
             done
             IFS='' read -r -d '' __ret << EOD || true
-      <li><a href="#proto">Show all protocol statistics</a></li>
       <li><a href="#route">Show all routes</a></li>
     </ul>
 EOD
@@ -1311,23 +1289,19 @@ EOD
                 IFS='' read -r -d '' __ret << EOD || true
     <div id="proto_g${g}">
         <h2>Group ${g} BGP session statistics</h2>
-        <pre><code>$(echo "show proto all group${g}" | birdc6 -s "$ctl")</code></pre>
+        <pre><code>$(echo "show proto all as${asn}_group${g}" | birdc6 -s "$BIRDCTL")</code></pre>
     </div>
     <div id="route_g${g}">
         <h2>Routes received from Group ${g}</h2>
-        <pre><code>$(echo "show route all protocol group${g}" | birdc6 -s "$ctl")</code></pre>
+        <pre><code>$(echo "show route all protocol as${asn}_group${g}" | birdc6 -s "$BIRDCTL")</code></pre>
     </div>
 EOD
                 page+="$__ret"
             done
             IFS='' read -r -d '' __ret << EOD || true
-    <div id="proto">
-        <h2>Show all protocol statistics</h2>
-        <pre><code>$(echo "show proto all" | birdc6 -s "$ctl")</code></pre>
-    </div>
     <div id="route">
         <h2>Show all routes</h2>
-        <pre><code>$(echo "show route all" | birdc6 -s "$ctl")</code></pre>
+        <pre><code>$(echo "show route all table as${asn}" | birdc6 -s "$BIRDCTL")</code></pre>
     </div>
 </body></html>
 EOD
@@ -1358,7 +1332,7 @@ Usage: $0 {action} [param] where {action} is one of
 
     -n/--named      (Re)start the named daemon
     -t/--tayga      (Re)start the tayga NAT64 daemon
-    -B [ASN]        Connect to the router CLI of [ASN]
+    --cli           Connect to the router CLI of the POPs
     --restart-bird  Restart the BGP peering servers
     --dump_bgp      Dump the BGP status of the peers
 
@@ -1385,7 +1359,7 @@ if [ "$UID" -ne "0" ]; then
 fi
 
 [ "$#" -lt "1" ] && print_help
-while getopts ":hskdrS:K:D:R:C:-:V:ntB:c:" optchar; do
+while getopts ":hskdrS:K:D:R:C:-:V:ntc:" optchar; do
     case "${optchar}" in
         -)
             case "${OPTARG}" in
@@ -1400,6 +1374,7 @@ while getopts ":hskdrS:K:D:R:C:-:V:ntB:c:" optchar; do
                 shutdown) shutdown_net  ;;
                 hostname) set_hostnames ;;
                 status)   vm_status     ;;
+                cli)      asn_cli       ;;
                 restart-bird) restart_bgp;;
                 dump-bgp) dump_bgp      ;;
                 *) echo "Unknown option --${OPTARG}" >&2 ;;
@@ -1418,7 +1393,6 @@ while getopts ":hskdrS:K:D:R:C:-:V:ntB:c:" optchar; do
         c) conn_vagra "$OPTARG";;
         V) LOG_LEVEL="$OPTARG" ;;
         h) print_help          ;;
-        B) asn_cli "$OPTARG"   ;;
         :) echo "Missing argument for -${OPTARG}" >&2 ;;
         *) print_help          ;;
     esac
