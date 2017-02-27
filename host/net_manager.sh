@@ -808,11 +808,15 @@ function _cleanup_vm {
         local asn="${BGP_ASN[$as]}"
         local rangebase="${NETBASE}:${asn}"
         local subnet="${rangebase}:${1}::/$((BASELEN+32))"
-        ip6tables -D FORWARD -i "$i" -s "$subnet" -j ACCEPT
-        ip6tables -D FORWARD -i "$i" -s "${rangebase}::$1" -j ACCEPT
-        ip6tables -D FORWARD -i "$i" -d "$subnet" -j ACCEPT
-        ip6tables -D FORWARD -i "$i" -d "${rangebase}::$1" -j ACCEPT
-        ip6tables -D FORWARD -i "$i" -j DROP
+        ebtables -D INPUT -i "$i" -p ip6 --ip6-source "$subnet" -j ACCEPT
+        ebtables -D INPUT -i "$i" -p ip6 --ip6-source "${rangebase}::$1" -j ACCEPT
+        ebtables -D INPUT -i "$i" -p ip6 -j DROP
+        ebtables -D INPUT -i "$i" -p ip -j DROP
+
+        ebtables -D OUTPUT -o "$i" -p ip6 --ip6-destination "$subnet" -j ACCEPT
+        ebtables -D OUTPUT -o "$i" -p ip6 --ip6-destination "${rangebase}::$1" -j ACCEPT
+        ebtables -D OUTPUT -o "$i" -p ip6 -j DROP
+        ebtables -D OUTPUT -o "$i" -p ip -j DROP
         ip tuntap del dev "$i" mode tap
         ((++count))
     done
@@ -850,6 +854,14 @@ function setup_ssh_management_port {
         # Infer destination IPv6 address from destination port
         # We also rewrite the source IP address (cfr. start_network)
         ip6tables -t nat -A PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
+
+        ebtables -A INPUT -i "$intf" -p ip6 --ip6-source "$sshtarget" -j ACCEPT
+        ebtables -A INPUT -i "$intf" -p ip6 -j DROP
+        ebtables -A INPUT -i "$intf" -p ip -j DROP
+
+        ebtables -A OUTPUT -o "$intf" -p ip6 --ip6-destination "$sshtarget" -j ACCEPT
+        ebtables -A OUTPUT -o "$intf" -p ip6 -j DROP
+        ebtables -A OUTPUT -o "$intf" -p ip -j DROP
     fi
 }
 
@@ -864,6 +876,14 @@ function del_ssh_management_port {
     guest_ssh_address "$1"
     local sshtarget="$__ret"
     ip6tables -t nat -D PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
+
+    ebtables -A INPUT -i "$intf" -p ip6 --ip6-source "$sshtarget" -j ACCEPT
+    ebtables -A INPUT -i "$intf" -p ip6 -j DROP
+    ebtables -A INPUT -i "$intf" -p ip -j DROP
+
+    ebtables -A OUTPUT -o "$intf" -p ip6 --ip6-destination "$sshtarget" -j ACCEPT
+    ebtables -A OUTPUT -o "$intf" -p ip6 -j DROP
+    ebtables -A OUTPUT -o "$intf" -p ip -j DROP
 }
 
 ###############################################################################
@@ -892,7 +912,7 @@ function set_hostnames {
     for g in "${ALL_GROUPS[@]}"; do
         local hname="group$g"
         debg "Setting VM hostname for $hname"
-        ssh -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" hostnamectl set-hostname "$hname"
+        ssh -6 -b "${SSHBASE}::" -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" hostnamectl set-hostname "$hname"
     done
 }
 
@@ -920,7 +940,6 @@ function start_vm {
     local intf="$__ret"
     setup_ssh_management_port "$1" "$port" "$intf"
     local macvm
-    printf -v macvm "%02d" "$1"
     CMD+=" -netdev tap,id=fwd${1},script=no,ifname=${intf}"
     CMD+=" -device e1000,netdev=fwd$1,mac=${MACBASE}:${macvm}:ff"
 
@@ -936,11 +955,15 @@ function start_vm {
             local subnet="${rangebase}:${1}::/$((BASELEN+32))"
             # Drop unrelated traffic (either the BGP traffic, or the delegated
             # prefix)
-            ip6tables -A FORWARD -i "$i" -s "$subnet" -j ACCEPT
-            ip6tables -A FORWARD -i "$i" -s "${rangebase}::$1" -j ACCEPT
-            ip6tables -A FORWARD -i "$i" -d "$subnet" -j ACCEPT
-            ip6tables -A FORWARD -i "$i" -d "${rangebase}::$1" -j ACCEPT
-            ip6tables -A FORWARD -i "$i" -j DROP
+            ebtables -A INPUT -i "$i" -p ip6 --ip6-source "$subnet" -j ACCEPT
+            ebtables -A INPUT -i "$i" -p ip6 --ip6-source "${rangebase}::$1" -j ACCEPT
+            ebtables -A INPUT -i "$i" -p ip6 -j DROP
+            ebtables -A INPUT -i "$i" -p ip -j DROP
+
+            ebtables -A OUTPUT -o "$i" -p ip6 --ip6-destination "$subnet" -j ACCEPT
+            ebtables -A OUTPUT -o "$i" -p ip6 --ip6-destination "${rangebase}::$1" -j ACCEPT
+            ebtables -A OUTPUT -o "$i" -p ip6 -j DROP
+            ebtables -A OUTPUT -o "$i" -p ip -j DROP
         fi
         local cid="g${1}c${count}"
         local cnt
@@ -1072,6 +1095,7 @@ function shutdown_net {
             ip tunta del dev "g${i}-${j}" mode tap;
         done;
     done
+    ebtables -F
     iptables -F
     iptables -F -t nat
     ip6tables -F
