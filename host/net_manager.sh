@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Group numbers
-ALL_GROUPS=(1 2 3 5 6 7 10)
+ALL_GROUPS=(1 2 3 5 6 7 10 20)
 # The qemu executable on *this* machine
 QEMU=qemu-system-x86_64
 # Verbosity
@@ -839,9 +839,9 @@ function setup_ssh_management_port {
     local intf="$3"
     if ! ip l sh dev "$intf"; then
         debg "Creating TAP interface $intf for SSH access to the VM"
-        mk_tuntap "$SSHBR"
+        mk_tuntap "$intf"
         ip l set dev "$intf" master "$SSHBR"
-        ip l set dev "$SSHBR" up 
+        ip l set dev "$intf" up 
 
         guest_ssh_address "$1"
         local sshtarget="$__ret"
