@@ -20,8 +20,8 @@ for i in eth0\
     ip link del dev "br$i" &> /dev/null
 done
 # Remove the added routes for the birdge prefix
-ip route add "$PREFIXB" via "fd00:300::${GROUPNUMBER}"
-ip route add "$PREFIXA" via "fd00:200::${GROUPNUMBER}"
+ip route del "$PREFIXB" via "fd00:300::${GROUPNUMBER}"
+ip route del "$PREFIXA" via "fd00:200::${GROUPNUMBER}"
 
 # Cleanup all network namespaces
 for ns in $(ip netns list) ; do
