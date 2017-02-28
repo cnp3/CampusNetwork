@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Group numbers
-ALL_GROUPS=(1 2 3 5 6 7 10 20)
+ALL_GROUPS=(1 2 3 5 6 7 9 10)
 # The qemu executable on *this* machine
 QEMU=qemu-system-x86_64
 # Verbosity
@@ -41,6 +41,7 @@ NAMEDCONF="${BDIR}/named.conf"
 ZONE_INGI="${BDIR}/db.ingi"
 REVERSE_INGI="${BDIR}/db.${NETBASE}"
 NAMEDPID='named.pid'
+NAMEDCACHE='/var/cache/bind'
 # BGP ASNs
 declare -A BGP_ASN
 BGP_ASN['belneta']=300
@@ -361,12 +362,38 @@ EOD
     echo "$cfg" > "$BIRDCFG"
 }
 
+function ip6_reverse {
+    local nf=':'
+    local prog='BEGIN {OFS=""; }
+    {
+        # How many nibbles are left blank ?
+        nibbles = 9 - NF;
+        for (i = 1; i <= NF; i++) {
+            # Find the :: location
+            if (length($i) == 0) {
+                # Fill it with quads
+                for (j = 1; j <= nibbles; j++) {
+                    $i = ($i "0000");
+                }
+            } else {
+                # Prepend zeroes as needed
+                $i = substr(("0000" $i), length($i) + 1);
+            }
+        }; 
+        print
+    }'
+    local reversed
+    reversed=$(echo "$1" | awk -F"$nf" "$prog" | rev | sed -e "s/./&./g")
+    echo "${reversed}ip6.arpa"
+}
+
 # Generate the configuration files for named
 function mk_named_config {
     # Start by creating the ingi zone file
     local zone
     IFS='' read -r -d '' zone << EOD || true
 \$TTL    604800
+\$ORIGIN ingi.
 @       IN      SOA     ingi. root.ingi. (
                               1         ; Serial
                          604800         ; Refresh
@@ -374,8 +401,8 @@ function mk_named_config {
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@         IN    NS      ns1.ingi.
-@         IN    NS      ns2.ingi.
+@         IN    NS      ns1
+@         IN    NS      ns2
 @         IN    AAAA    ${BIND_ADDRESS}
 @         IN    TXT     "TLD for the LINGI2142 project"
 ns1       IN    AAAA    ${BIND_ADDRESS}
@@ -386,7 +413,8 @@ EOD
     # TODO proper IPv6 address explosion functino
     local reverse
     IFS='' read -r -d '' reverse << EOD || true
-$TTL    604800
+\$TTL    604800
+\$ORIGIN ingi.
 @       IN      SOA     ingi. root.ingi. (
                               1         ; Serial
                          604800         ; Refresh
@@ -394,16 +422,13 @@ $TTL    604800
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@         IN    NS      ns1.ingi.
-@         IN    NS      ns2.ingi.
+@         IN    NS      ns1
+@         IN    NS      ns2
 @         IN    TXT     "Reverse bindings for the TLD of the LINGI2142 project"
-ns1       IN    AAAA    fd00::d
-ns2       IN    AAAA    fd00::d
-b.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    belneta.ingi.
-b.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.0.0.d.f.ip6.arpa.    IN    PTR    belnetb.ingi.
-d.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.d.f.ip6.arpa.    IN    PTR    ns1.ingi.
-d.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.d.f.ip6.arpa.    IN    PTR    ns2.ingi.
-
+ns1       IN    AAAA    $BIND_ADDRESS
+ns2       IN    AAAA    $BIND_ADDRESS
+$(ip6_reverse "$BIND_ADDRESS")    IN    PTR    ns1
+$(ip6_reverse "$BIND_ADDRESS")    IN    PTR    ns2
 EOD
     # Add bindings for the BGP peerings
     for peer in "${ASN_KEYS[@]@}"; do
@@ -411,20 +436,24 @@ EOD
         local src="$__ret"
         IFS='' read -r -d '' __ret << EOD || true
 ${peer}   IN    AAAA    ${src} 
-
 EOD
         zone+="$__ret"
+        IFS='' read -r -d '' __ret << EOD || true
+$(ip6_reverse "$src")    IN    PTR    ${peer}
+EOD
+        reverse+="$__ret"
     done
 
     local named
-    IFS='' read -r -d '' named << EOD
+    IFS='' read -r -d '' named << EOD || true
 acl known_client {
         localhost;
+        ::1;
         ${NETBASE}::/${BASELEN};
 };
 
 options {
-        directory "/var/cache/bind";
+        directory "$NAMEDCACHE";
 
         forwarders {
             $(grep nameserver /etc/resolv.conf | sed 's/nameserver //' | sed -e 's/$/;/')        
@@ -439,8 +468,9 @@ options {
 
         auth-nxdomain no;    # conform to RFC1035
         listen-on-v6 { ${BIND_ADDRESS}; };
+        listen-on { 127.0.0.1; }
 
-        allow-transfer { none; };
+        allow-transfer { ::1; 127.0.0.1; ${BIND_ADDRESS}; };
 
         dns64 ${NAT64PREFIX}::/96 {
                 clients {
@@ -454,15 +484,12 @@ options {
 zone "ingi." {
         type master;
         file "${ZONE_INGI}";
-        allow-query { any; };
-        allow-transfer { "none"; };
+        forwarders { };
 };
 
 zone "0.0.d.f.ip6.arpa" {
         type master;
         file "${REVERSE_INGI}";
-        allow-query { any; };
-        allow-transfer { "none"; };
 };
 
 include "/etc/bind/zones.rfc1918";
@@ -753,7 +780,7 @@ function stop_tayga {
 }
 
 function stop_named {
-    killall named &> /dev/null
+    kill -s 9 $(cat "${NAMEDCACHE}/${NAMEDPID}") &> /dev/null
     debg "Stopped named"
     ip address del dev lo "$BIND_ADDRESS"
 }
