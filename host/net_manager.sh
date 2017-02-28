@@ -967,6 +967,7 @@ function start_vm {
     local intf="$__ret"
     setup_ssh_management_port "$1" "$port" "$intf"
     local macvm
+    printf -v macvm "%02d" "$1"
     CMD+=" -netdev tap,id=fwd${1},script=no,ifname=${intf}"
     CMD+=" -device e1000,netdev=fwd$1,mac=${MACBASE}:${macvm}:ff"
 
