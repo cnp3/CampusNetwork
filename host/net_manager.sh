@@ -679,6 +679,11 @@ function start_network {
         start_pop "$pop"
     done
 
+    ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-solicitation -I INPUT
+    ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-advertisement -I INPUT
+    ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-solicitation -I OUTPUT
+    ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-advertisement -I OUTPUT
+
     start_bgp
     start_looking_glass
 }
@@ -720,6 +725,11 @@ function kill_network {
 
     stop_bgp
     stop_looking_glass
+
+    ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-solicitation -D INPUT
+    ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-advertisement -D INPUT
+    ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-solicitation -D OUTPUT
+    ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-advertisement -D OUTPUT
 }
 
 function start_tayga {
