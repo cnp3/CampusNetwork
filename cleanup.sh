@@ -15,8 +15,8 @@ fi
 
 echo 'Destroying the root bridges'
 # Gracefully disconnect from the bridge in the root namespace (if any)
-for i in eth0\
-         eth1; do
+for i in eth1\
+         eth2; do
     ip link del dev "br$i" &> /dev/null
 done
 # Remove the added routes for the birdge prefix
