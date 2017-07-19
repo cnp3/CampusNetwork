@@ -1,0 +1,11 @@
+127.0.0.1	localhost
+127.0.1.1	jessie.raw	jessie
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+fd00:200:2:204::5 web21.group2.ingi
+fd00:200:2:204::6 web22.group2.ingi
+

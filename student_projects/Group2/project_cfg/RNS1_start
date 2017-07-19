@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ip link set dev RNS1-eth0 up
+routing/setup_lan.py RNS1-eth0
+
+/usr/sbin/named -6
+/usr/sbin/sshd
+
+ulogd -d
+#firewall/ST-RNS.sh

@@ -1,0 +1,7 @@
+server ns1.group2.ingi.
+update delete www.group2.ingi. AAAA 
+send
+server ns1.group2.ingi.
+update add www.group2.ingi 60 AAAA fd00:300:2:103::4
+update add www.group2.ingi 60 AAAA fd00:300:2:204::4
+send

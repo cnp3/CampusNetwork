@@ -1,0 +1,64 @@
+<h1>Monitoring status</h1>
+Sat Apr 29 21:30:21 GMT 2017
+<b>Current network state :</b> FAILOVER <br/><br/>
+<h2>www DNS request from ns1.group2.ingi</h2>
+<pre>
+
+; <<>> DiG 9.9.5-9+deb8u10-Debian <<>> @ns1.group2.ingi www.group2.ingi AAAA
+; (2 servers found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 42727
+;; flags: qr aa rd; QUERY: 1, ANSWER: 2, AUTHORITY: 2, ADDITIONAL: 5
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;www.group2.ingi.		IN	AAAA
+
+;; ANSWER SECTION:
+www.group2.ingi.	60	IN	AAAA	fd00:300:2:204::4
+www.group2.ingi.	60	IN	AAAA	fd00:300:2:103::4
+
+;; AUTHORITY SECTION:
+group2.ingi.		604800	IN	NS	ns2.group2.ingi.
+group2.ingi.		604800	IN	NS	ns1.group2.ingi.
+
+;; ADDITIONAL SECTION:
+ns1.group2.ingi.	604800	IN	AAAA	fd00:300:2:103::2
+ns1.group2.ingi.	604800	IN	AAAA	fd00:200:2:103::2
+ns2.group2.ingi.	604800	IN	AAAA	fd00:200:2:204::2
+ns2.group2.ingi.	604800	IN	AAAA	fd00:300:2:204::2
+
+;; Query time: 0 msec
+;; SERVER: fd00:200:2:103::2#53(fd00:200:2:103::2)
+;; WHEN: Sat Apr 29 21:30:21 GMT 2017
+;; MSG SIZE  rcvd: 248
+
+</pre>
+<h2>Bird protocols states per router</h2>
+<h3>sh1c.group2.ingi</h3>
+<pre>
+<b>Couldn't connect to Bird daemon.</b>
+</pre>
+<h3>hall.group2.ingi</h3>
+<pre>
+<b>Couldn't connect to Bird daemon.</b>
+</pre>
+<h3>pyth.group2.ingi</h3>
+<pre>
+<b>Couldn't connect to Bird daemon.</b>
+</pre>
+<h3>stev.group2.ingi</h3>
+<pre>
+<b>Couldn't connect to Bird daemon.</b>
+</pre>
+<h3>carn.group2.ingi</h3>
+<pre>
+<b>Couldn't connect to Bird daemon.</b>
+</pre>
+<h3>mich.group2.ingi</h3>
+<pre>
+<b>Couldn't connect to Bird daemon.</b>
+</pre>

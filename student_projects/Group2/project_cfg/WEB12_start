@@ -1,0 +1,11 @@
+#!/bin/bash
+
+ip link set dev WEB12-eth0 up
+routing/setup_lan.py WEB12-eth0
+
+/usr/sbin/sshd
+#lighttpd -f /etc/lighttpd/lighttpd.conf
+/usr/local/nginx/sbin/nginx -c /etc/nginx/nginx.conf
+
+ulogd -d
+#firewall/ST-WEB2.sh

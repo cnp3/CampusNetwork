@@ -1,0 +1,130 @@
+{
+  "NS1": {
+    "use_type": "1",
+    "location": "00",
+    "forced_address": "::53",
+    "default_route": "fd00:200:3:100::",
+    "bind9": "named1",
+    "extra_commands": [
+      "iperf3 -s -D",
+      "/usr/sbin/sshd"
+    ]
+  },
+  "DC1LB": {
+    "use_type": "1",
+    "location": "00",
+    "forced_address": "::80",
+    "default_route": "fd00:200:3:100::",
+    "extra_commands": [
+      "/usr/sbin/sshd"
+    ]
+  },
+  "DC1S1": {
+    "use_type": "1",
+    "location": "00",
+    "forced_address": "::180",
+    "default_route": "fd00:200:3:100::",
+    "extra_commands": [
+      "apachectl start",
+      "/usr/sbin/sshd"
+    ]
+  },
+  "DC1S2": {
+    "use_type": "1",
+    "location": "00",
+    "forced_address": "::280",
+    "default_route": "fd00:200:3:100::",
+    "extra_commands": [
+      "apachectl start",
+      "/usr/sbin/sshd"
+    ]
+  },
+  "DC1S3": {
+    "use_type": "1",
+    "location": "00",
+    "forced_address": "::380",
+    "default_route": "fd00:200:3:100::",
+    "extra_commands": [
+      "apachectl start",
+      "/usr/sbin/sshd"
+    ]
+  },
+  "NS2": {
+    "use_type": "1",
+    "location": "01",
+    "forced_address": "::53",
+    "default_route": "fd00:200:3:101::",
+    "bind9": "named2",
+    "extra_commands": [
+      "iperf3 -s -D",
+      "/usr/sbin/sshd"
+    ]
+  },
+  "DC2LB": {
+    "use_type": "1",
+    "location": "01",
+    "forced_address": "::80",
+    "default_route": "fd00:200:3:101::",
+    "extra_commands": [
+      "/usr/sbin/sshd"
+    ]
+  },
+  "DC2S1": {
+    "use_type": "1",
+    "location": "01",
+    "forced_address": "::180",
+    "default_route": "fd00:200:3:101::",
+    "extra_commands": [
+      "apachectl start",
+      "/usr/sbin/sshd"
+    ]
+  },
+  "DC2S2": {
+    "use_type": "1",
+    "location": "01",
+    "forced_address": "::280",
+    "default_route": "fd00:200:3:101::",
+    "extra_commands": [
+      "apachectl start",
+      "/usr/sbin/sshd"
+    ]
+  },
+  "DC2S3": {
+    "use_type": "1",
+    "location": "01",
+    "forced_address": "::380",
+    "default_route": "fd00:200:3:101::",
+    "extra_commands": [
+      "apachectl start",
+      "/usr/sbin/sshd"
+    ]
+  },
+  "MONIT": {
+    "use_type": "0",
+    "location": "ff",
+    "forced_address": "::1",
+    "default_route": "fd00:200:3:0ff::",
+    "extra_commands": [
+      "/etc/isp_status_check.sh &",
+      "/etc/services_status_check.sh &"
+    ]
+  },
+  "DHCP1": {
+    "use_type": "1",
+    "location": "00",
+    "forced_address": "::547",
+    "default_route": "fd00:200:3:100::",
+    "extra_commands": [
+      "dhcpd -q -6 -f -cf /etc/dhcp/dhcpd6.conf -pf /var/run/dhcpd1.pid -tf /var/log/dhcpd/dhcpd1.log  -lf /etc/dhcp/dhcpd6.leases"
+    ]
+  },
+  "DHCP2": {
+    "use_type": "1",
+    "location": "01",
+    "forced_address": "::547",
+    "default_route": "fd00:300:3:101::",
+    "extra_commands": [
+      "dhcpd -q -6 -f -cf /etc/dhcp/dhcpd6.conf -pf /var/run/dhcpd2.pid -tf /var/log/dhcpd/dhcpd2.log -lf /etc/dhcp/dhcpd6.leases"
+    ]
+  }
+}

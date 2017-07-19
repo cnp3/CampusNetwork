@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ip link set dev ST1-eth0 up
+routing/setup_lan.py ST1-eth0
+
+(sleep 5 ; dhclient -6 ST1-eth0.1) &

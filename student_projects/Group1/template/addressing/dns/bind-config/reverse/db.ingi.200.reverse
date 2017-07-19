@@ -1,0 +1,4 @@
+; This file is imported in db.ingi.private.200.reverse and db.ingi.public.200.reverse
+$TTL 300
+[[reverse_name_200]]	IN	NS	ns.group1.ingi.
+[[reverse_records_200]]

@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Towards MICH
+ip link set dev SH1C-eth0 up
+#ip address add dev SH1C-eth0 fd00:2:af::a/64
+
+# Towards HALL
+ip link set dev SH1C-eth1 up
+#ip address add dev SH1C-eth0 fd00:2:ab::a/64
+
+# LAN
+routing/setup_lan.py SH1C-lan0
+
+bird6 -s /tmp/SH1C.ctl
+
+# dhcp relay
+dhcrelay -q -6 -l SH1C-lan0.3 -l SH1C-lan0.4 -u fd00:200:2:103::1%SH1C-eth0 -u fd00:200:2:103::1%SH1C-eth1 -u fd00:200:2:204::1%SH1C-eth0 -u fd00:200:2:204::1%SH1C-eth1 --no-pid
+
+#Firewall
+firewall/SH1C.sh
+ulogd -d
+
+/usr/sbin/sshd
+
+#radvd
+radvd -n -C /etc/radvd.conf
+

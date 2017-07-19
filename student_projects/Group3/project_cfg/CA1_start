@@ -1,0 +1,11 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see host_config_creation.py for details. 
+
+
+        ip link set dev CA1-eth0 up
+        ip link add link CA1-eth0 name CA1-eth0.203 type vlan id 0x203
+        ip link set dev CA1-eth0.203 up
+        
+        sleep 20; rdnssd -H /etc/rdnssd/merge-hook -u rdnssd -p /var/run/CA1_rdnssd.pid
+        

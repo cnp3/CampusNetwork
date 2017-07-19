@@ -1,0 +1,12 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see service_config_creation.py for details. 
+
+ip link set dev DC1LB-eth0 up 
+ip address add dev DC1LB-eth0 fd00:200:3:100::80/64 
+ip address add dev DC1LB-eth0 fd00:300:3:100::80/64 
+
+ip -6 route add ::/0 via fd00:200:3:100:: 
+
+/usr/sbin/sshd
+

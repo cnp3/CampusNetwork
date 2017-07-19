@@ -1,0 +1,7 @@
+
+# Below we open for students access to different services. See the report
+# for more exlainations about rights attributed for the different user types.
+# We allow for students : TCP 22,25,53,80,110,143,220,443,993,995,5001
+# And UDP 53. Note : TCP 5001 is open for experimental purpose.
+# As there are 16 zones available in our addressing plan, 2 possible prefixes
+# and 2 protocols to cover (tcp & udp), there are 64 lines below for this task.

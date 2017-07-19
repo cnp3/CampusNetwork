@@ -1,0 +1,22 @@
+$TTL 10800
+$ORIGIN 1.0.3.0.0.0.0.0.3.0.0.0.d.f.ip6.arpa.
+@   IN SOA  @ service.group3.ingi.(
+            2017050100   ; serial
+            7200    ; refresh  (  2   hours)
+            900     ; retry    (  15  min)
+            1209600 ; expire   (  2   weeks)
+            1800 )  ; minimum  (  30  min)
+@             IN        NS        ns1.group3.ingi. 
+@             IN        NS        ns2.group3.ingi. 
+0.8.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0    IN    PTR   DC1S2.service.group3.ingi. 
+0.8.1.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0    IN    PTR   DC2S1.service.group3.ingi. 
+0.8.2.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0    IN    PTR   DC2S2.service.group3.ingi. 
+0.8.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0    IN    PTR   DC1S1.service.group3.ingi. 
+7.4.5.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0    IN    PTR   DHCP2.service.group3.ingi. 
+3.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0    IN    PTR   NS2.service.group3.ingi. 
+0.8.3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0    IN    PTR   DC1S3.service.group3.ingi. 
+0.8.3.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0    IN    PTR   DC2S3.service.group3.ingi. 
+0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0    IN    PTR   DC1LB.service.group3.ingi. 
+0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0    IN    PTR   DC2LB.service.group3.ingi. 
+3.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0    IN    PTR   NS1.service.group3.ingi. 
+7.4.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0    IN    PTR   DHCP1.service.group3.ingi. 

@@ -1,0 +1,23 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+zone "group2.ingi" {
+    type master; // ANS1 is the master in our network
+    file "/etc/bind/zones/db.group2.ingi"; // Load the default-state zones
+    allow-update { fd00:200:2::1; fd00:200:2:205::1; }; // Dynamic updates are allowed from the monitoring servers
+    notify yes; // Notify the other NS servers if there's an update
+    allow-transfer { fd00:200:2:204::2; fd00:300:2:204::2; ::/0;}; // Allow AXFR from the slave (and from everyone, as described in the project's guidelines)
+};
+
+zone "0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa." {
+    type master; // ANS1 is the master in our network
+    file "/etc/bind/zones/db.200.ingi"; // Load the rDNS zone
+    allow-update { none; }; // No DDNS for this zone
+    allow-transfer { fd00:200:2:204::2; fd00:300:2:204::2; ::/0;}; // Allow AXFR from the slave (and from everyone, as described in the project's guidelines)
+};
+

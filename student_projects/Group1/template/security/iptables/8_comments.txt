@@ -1,0 +1,5 @@
+# We consider that it should not be allowed to students to host any service. 
+# We don't see a remarkable utility to the students to host a website for exemple. We prefer 
+# to have this limitation for a security point of view: students are in this way better protected: 
+# if they have for exemple a running ssh session on their laptop, other students wont be able 
+# to try to connect on this session. Furthurmore this limitation may reduce the bandwith used.

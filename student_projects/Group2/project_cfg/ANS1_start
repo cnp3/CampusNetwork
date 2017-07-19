@@ -1,0 +1,14 @@
+#!/bin/bash
+
+ip link set dev ANS1-eth0 up
+routing/setup_lan.py ANS1-eth0
+
+# Need to do some tricks in order to make DDNS updates working
+rm /etc/bind/zones/*.jnl # Remove previous journaling files
+cp /etc/bind/zones/db.group2.ingi.back /etc/bind/zones/db.group2.ingi # Restore original DNS DB
+chmod 777 /etc/bind/zones # otherwise BIND bugs with DDNS ...
+/usr/sbin/named -6
+
+/usr/sbin/sshd
+ulogd -d
+#firewall/ST-ANS.sh

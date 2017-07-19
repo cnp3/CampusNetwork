@@ -1,0 +1,37 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see router_config_creation.py for details. 
+
+
+ip link set dev SH1C-eth1 up 
+ip address add dev SH1C-eth1 fd00:200:3:7::6/64 
+ip address add dev SH1C-eth1 fd00:300:3:7::6/64 
+ip link set dev SH1C-eth0 up 
+ip address add dev SH1C-eth0 fd00:200:3:6::6/64 
+ip address add dev SH1C-eth0 fd00:300:3:6::6/64 
+
+
+ip link set dev SH1C-lan0 up 
+ip link add link SH1C-lan0 name SH1C-lan0.205 type vlan id 0x205 
+ip link set dev SH1C-lan0.205 up 
+ip address add dev SH1C-lan0.205 fd00:200:3:205::/64 
+ip address add dev SH1C-lan0.205 fd00:300:3:205::/64 
+ip link add link SH1C-lan0 name SH1C-lan0.305 type vlan id 0x305 
+ip link set dev SH1C-lan0.305 up 
+ip address add dev SH1C-lan0.305 fd00:200:3:305::/64 
+ip address add dev SH1C-lan0.305 fd00:300:3:305::/64 
+ip link add link SH1C-lan0 name SH1C-lan0.505 type vlan id 0x505 
+ip link set dev SH1C-lan0.505 up 
+ip address add dev SH1C-lan0.505 fd00:200:3:505::/64 
+ip address add dev SH1C-lan0.505 fd00:300:3:505::/64 
+ip link add link SH1C-lan0 name SH1C-lan0.605 type vlan id 0x605 
+ip link set dev SH1C-lan0.605 up 
+ip address add dev SH1C-lan0.605 fd00:200:3:605::/64 
+ip address add dev SH1C-lan0.605 fd00:300:3:605::/64 
+
+
+/usr/sbin/sshd
+
+dhcrelay -q -pf /var/run/SH1C_dhcrel -6  -l SH1C-lan0.205 -l SH1C-lan0.305 -l SH1C-lan0.505 -l SH1C-lan0.605 -u fd00:200:3:100::547%SH1C-eth1 -u fd00:200:3:101::547%SH1C-eth1 -u fd00:300:3:100::547%SH1C-eth1 -u fd00:300:3:101::547%SH1C-eth1 -u fd00:200:3:100::547%SH1C-eth0 -u fd00:200:3:101::547%SH1C-eth0 -u fd00:300:3:100::547%SH1C-eth0 -u fd00:300:3:101::547%SH1C-eth0
+bird6 -s /tmp/SH1C.ctl -P /tmp/SH1C_bird.pid 
+radvd -p /var/run/radvd/SH1C_radvd.pid -C /etc/radvd/SH1C.conf -m logfile -l /var/log/radvd/SH1C.log

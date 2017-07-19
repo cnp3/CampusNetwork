@@ -1,0 +1,37 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see router_config_creation.py for details. 
+
+
+ip link set dev STEV-eth1 up 
+ip address add dev STEV-eth1 fd00:200:3:4::3/64 
+ip address add dev STEV-eth1 fd00:300:3:4::3/64 
+ip link set dev STEV-eth0 up 
+ip address add dev STEV-eth0 fd00:200:3:3::3/64 
+ip address add dev STEV-eth0 fd00:300:3:3::3/64 
+
+
+ip link set dev STEV-lan0 up 
+ip link add link STEV-lan0 name STEV-lan0.202 type vlan id 0x202 
+ip link set dev STEV-lan0.202 up 
+ip address add dev STEV-lan0.202 fd00:200:3:202::/64 
+ip address add dev STEV-lan0.202 fd00:300:3:202::/64 
+ip link add link STEV-lan0 name STEV-lan0.302 type vlan id 0x302 
+ip link set dev STEV-lan0.302 up 
+ip address add dev STEV-lan0.302 fd00:200:3:302::/64 
+ip address add dev STEV-lan0.302 fd00:300:3:302::/64 
+ip link add link STEV-lan0 name STEV-lan0.502 type vlan id 0x502 
+ip link set dev STEV-lan0.502 up 
+ip address add dev STEV-lan0.502 fd00:200:3:502::/64 
+ip address add dev STEV-lan0.502 fd00:300:3:502::/64 
+ip link add link STEV-lan0 name STEV-lan0.602 type vlan id 0x602 
+ip link set dev STEV-lan0.602 up 
+ip address add dev STEV-lan0.602 fd00:200:3:602::/64 
+ip address add dev STEV-lan0.602 fd00:300:3:602::/64 
+
+
+/usr/sbin/sshd
+
+dhcrelay -q -pf /var/run/STEV_dhcrel -6  -l STEV-lan0.202 -l STEV-lan0.302 -l STEV-lan0.502 -l STEV-lan0.602 -u fd00:200:3:100::547%STEV-eth1 -u fd00:200:3:101::547%STEV-eth1 -u fd00:300:3:100::547%STEV-eth1 -u fd00:300:3:101::547%STEV-eth1 -u fd00:200:3:100::547%STEV-eth0 -u fd00:200:3:101::547%STEV-eth0 -u fd00:300:3:100::547%STEV-eth0 -u fd00:300:3:101::547%STEV-eth0
+bird6 -s /tmp/STEV.ctl -P /tmp/STEV_bird.pid 
+radvd -p /var/run/radvd/STEV_radvd.pid -C /etc/radvd/STEV.conf -m logfile -l /var/log/radvd/STEV.log

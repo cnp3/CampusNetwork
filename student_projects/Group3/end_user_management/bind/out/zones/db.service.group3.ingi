@@ -1,0 +1,34 @@
+$TTL 10800
+@   IN SOA  @ service.group3.ingi.(
+            2017050100   ; serial
+            7200    ; refresh  (  2   hours)
+            900     ; retry    (  15  min)
+            1209600 ; expire   (  2   weeks)
+            1800 )  ; minimum  (  30  min)
+@             IN        NS        ns1.group3.ingi. 
+@             IN        NS        ns2.group3.ingi. 
+@             IN        TXT       "Service group3" 
+DC1LB      IN    AAAA     fd00:200:3:100::80 
+DC1LB      IN    AAAA     fd00:300:3:100::80 
+NS2      IN    AAAA     fd00:200:3:101::53 
+NS2      IN    AAAA     fd00:300:3:101::53 
+DHCP2      IN    AAAA     fd00:200:3:101::547 
+DHCP2      IN    AAAA     fd00:300:3:101::547 
+DC2S3      IN    AAAA     fd00:200:3:101::380 
+DC2S3      IN    AAAA     fd00:300:3:101::380 
+DC2LB      IN    AAAA     fd00:200:3:101::80 
+DC2LB      IN    AAAA     fd00:300:3:101::80 
+DC2S1      IN    AAAA     fd00:200:3:101::180 
+DC2S1      IN    AAAA     fd00:300:3:101::180 
+DHCP1      IN    AAAA     fd00:200:3:100::547 
+DHCP1      IN    AAAA     fd00:300:3:100::547 
+DC1S3      IN    AAAA     fd00:200:3:100::380 
+DC1S3      IN    AAAA     fd00:300:3:100::380 
+NS1      IN    AAAA     fd00:200:3:100::53 
+NS1      IN    AAAA     fd00:300:3:100::53 
+DC1S1      IN    AAAA     fd00:200:3:100::180 
+DC1S1      IN    AAAA     fd00:300:3:100::180 
+DC1S2      IN    AAAA     fd00:200:3:100::280 
+DC1S2      IN    AAAA     fd00:300:3:100::280 
+DC2S2      IN    AAAA     fd00:200:3:101::280 
+DC2S2      IN    AAAA     fd00:300:3:101::280 

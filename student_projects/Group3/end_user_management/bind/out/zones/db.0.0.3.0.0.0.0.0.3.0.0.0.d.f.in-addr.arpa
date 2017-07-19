@@ -1,0 +1,24 @@
+$ORIGIN 0.0.3.0.0.0.0.0.3.0.0.0.d.f.ip6.arpa.
+$TTL 10800
+@   IN SOA  @ router.group3.ingi.(
+            2017050100   ; serial
+            7200    ; refresh  (  2   hours)
+            900     ; retry    (  15  min)
+            1209600 ; expire   (  2   weeks)
+            1800 )  ; minimum  (  30  min)
+@             IN        NS        ns1.group3.ingi. 
+@             IN        NS        ns2.group3.ingi. 
+2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0    IN    PTR   PYTH.router.group3.ingi. 
+2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0    IN    PTR   PYTH.router.group3.ingi. 
+2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0    IN    PTR   PYTH.router.group3.ingi. 
+1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7.0    IN    PTR   HALL.router.group3.ingi. 
+1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0    IN    PTR   HALL.router.group3.ingi. 
+1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0    IN    PTR   HALL.router.group3.ingi. 
+6.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.0    IN    PTR   SH1C.router.group3.ingi. 
+6.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7.0    IN    PTR   SH1C.router.group3.ingi. 
+3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0    IN    PTR   STEV.router.group3.ingi. 
+3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0    IN    PTR   STEV.router.group3.ingi. 
+4.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0    IN    PTR   CARN.router.group3.ingi. 
+4.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5.0    IN    PTR   CARN.router.group3.ingi. 
+5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.0    IN    PTR   MICH.router.group3.ingi. 
+5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5.0    IN    PTR   MICH.router.group3.ingi. 

@@ -1,0 +1,38 @@
+$TTL 10800
+@   IN SOA  @ router.group3.ingi.(
+            2017050100   ; serial
+            7200    ; refresh  (  2   hours)
+            900     ; retry    (  15  min)
+            1209600 ; expire   (  2   weeks)
+            1800 )  ; minimum  (  30  min)
+@             IN        NS        ns1.group3.ingi. 
+@             IN        NS        ns2.group3.ingi. 
+@             IN        TXT       "Router group3" 
+CARN          IN        AAAA      fd00:200:3:4::4 
+CARN          IN        AAAA      fd00:300:3:4::4 
+CARN          IN        AAAA      fd00:200:3:5::4 
+CARN          IN        AAAA      fd00:300:3:5::4 
+PYTH          IN        AAAA      fd00:200:3:2::2 
+PYTH          IN        AAAA      fd00:300:3:2::2 
+PYTH          IN        AAAA      fd00:200:3:1::2 
+PYTH          IN        AAAA      fd00:300:3:1::2 
+PYTH          IN        AAAA      fd00:200:3:3::2 
+PYTH          IN        AAAA      fd00:300:3:3::2 
+STEV          IN        AAAA      fd00:200:3:3::3 
+STEV          IN        AAAA      fd00:300:3:3::3 
+STEV          IN        AAAA      fd00:200:3:4::3 
+STEV          IN        AAAA      fd00:300:3:4::3 
+HALL          IN        AAAA      fd00:200:3:2::1 
+HALL          IN        AAAA      fd00:300:3:2::1 
+HALL          IN        AAAA      fd00:200:3:7::1 
+HALL          IN        AAAA      fd00:300:3:7::1 
+HALL          IN        AAAA      fd00:200:3:1::1 
+HALL          IN        AAAA      fd00:300:3:1::1 
+SH1C          IN        AAAA      fd00:200:3:6::6 
+SH1C          IN        AAAA      fd00:300:3:6::6 
+SH1C          IN        AAAA      fd00:200:3:7::6 
+SH1C          IN        AAAA      fd00:300:3:7::6 
+MICH          IN        AAAA      fd00:200:3:6::5 
+MICH          IN        AAAA      fd00:300:3:6::5 
+MICH          IN        AAAA      fd00:200:3:5::5 
+MICH          IN        AAAA      fd00:300:3:5::5 

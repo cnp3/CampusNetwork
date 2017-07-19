@@ -1,0 +1,39 @@
+;
+; BIND data file for local loopback interface
+;
+$TTL	604800
+@	IN	SOA	ns1.group2.ingi. admin.group2.ingi. (
+			      3		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	 IN	NS	ns1.group2.ingi.
+@	 IN	NS	ns2.group2.ingi.
+
+; Routers and servers on the network
+
+sh1c IN	AAAA	fd00:200:2::
+hall IN	AAAA	fd00:200:2:1::
+pyth IN	AAAA	fd00:200:2:102::
+stev IN	AAAA	fd00:200:2:103::
+carn IN	AAAA	fd00:200:2:204::
+mich IN	AAAA	fd00:200:2:205::
+
+dhcp1 IN	AAAA	fd00:200:2:103::1
+
+ns1   IN AAAA	fd00:200:2:103::2
+ns1   IN AAAA	fd00:300:2:103::2
+
+ns2   IN AAAA	fd00:200:2:103::2 ; TODO
+ns2   IN AAAA	fd00:300:2:103::2
+
+rns1  IN AAAA	fd00:200:2:103::3
+
+lb1   IN AAAA	fd00:200:2:103::4
+
+web11 IN AAAA	fd00:200:2:103::5
+web12 IN AAAA	fd00:200:2:103::5
+
+www   5m IN AAAA	fd00:200:2:103::4

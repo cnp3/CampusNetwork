@@ -1,0 +1,12 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see host_config_creation.py for details. 
+
+
+        ip link set dev SH1-eth0 up
+        ip link add link SH1-eth0 name SH1-eth0.205 type vlan id 0x205
+        ip link set dev SH1-eth0.205 up
+        
+        sleep 20; dhclient -6 -pf /var/run/dhclient_SH1.pid -S SH1-eth0.205
+        iperf3 -s -D
+

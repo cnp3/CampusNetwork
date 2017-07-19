@@ -1,0 +1,11 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see host_config_creation.py for details. 
+
+
+        ip link set dev MI2-eth0 up
+        ip link add link MI2-eth0 name MI2-eth0.304 type vlan id 0x304
+        ip link set dev MI2-eth0.304 up
+        
+        sleep 20; rdnssd -H /etc/rdnssd/merge-hook -u rdnssd -p /var/run/MI2_rdnssd.pid
+        

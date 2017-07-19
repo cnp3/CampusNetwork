@@ -1,0 +1,37 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see router_config_creation.py for details. 
+
+
+ip link set dev MICH-eth1 up 
+ip address add dev MICH-eth1 fd00:200:3:5::5/64 
+ip address add dev MICH-eth1 fd00:300:3:5::5/64 
+ip link set dev MICH-eth0 up 
+ip address add dev MICH-eth0 fd00:200:3:6::5/64 
+ip address add dev MICH-eth0 fd00:300:3:6::5/64 
+
+
+ip link set dev MICH-lan0 up 
+ip link add link MICH-lan0 name MICH-lan0.204 type vlan id 0x204 
+ip link set dev MICH-lan0.204 up 
+ip address add dev MICH-lan0.204 fd00:200:3:204::/64 
+ip address add dev MICH-lan0.204 fd00:300:3:204::/64 
+ip link add link MICH-lan0 name MICH-lan0.304 type vlan id 0x304 
+ip link set dev MICH-lan0.304 up 
+ip address add dev MICH-lan0.304 fd00:200:3:304::/64 
+ip address add dev MICH-lan0.304 fd00:300:3:304::/64 
+ip link add link MICH-lan0 name MICH-lan0.504 type vlan id 0x504 
+ip link set dev MICH-lan0.504 up 
+ip address add dev MICH-lan0.504 fd00:200:3:504::/64 
+ip address add dev MICH-lan0.504 fd00:300:3:504::/64 
+ip link add link MICH-lan0 name MICH-lan0.604 type vlan id 0x604 
+ip link set dev MICH-lan0.604 up 
+ip address add dev MICH-lan0.604 fd00:200:3:604::/64 
+ip address add dev MICH-lan0.604 fd00:300:3:604::/64 
+
+
+/usr/sbin/sshd
+
+dhcrelay -q -pf /var/run/MICH_dhcrel -6  -l MICH-lan0.204 -l MICH-lan0.304 -l MICH-lan0.504 -l MICH-lan0.604 -u fd00:200:3:100::547%MICH-eth1 -u fd00:200:3:101::547%MICH-eth1 -u fd00:300:3:100::547%MICH-eth1 -u fd00:300:3:101::547%MICH-eth1 -u fd00:200:3:100::547%MICH-eth0 -u fd00:200:3:101::547%MICH-eth0 -u fd00:300:3:100::547%MICH-eth0 -u fd00:300:3:101::547%MICH-eth0
+bird6 -s /tmp/MICH.ctl -P /tmp/MICH_bird.pid 
+radvd -p /var/run/radvd/MICH_radvd.pid -C /etc/radvd/MICH.conf -m logfile -l /var/log/radvd/MICH.log

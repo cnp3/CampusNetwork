@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Towards HALL
+ip link set dev PYTH-eth0 up
+ip address add dev PYTH-eth0 fd00:2:bc::c/64 preferred_lft 0
+
+# Towards STEV
+ip link set dev PYTH-eth1 up
+#ip address add dev PYTH-eth1 fd00:2:cd::c/64
+
+# Towards CARN
+ip link set dev PYTH-eth2 up
+#ip address add dev PYTH-eth2 fd00:2:ce::c/64
+
+# LAN
+routing/setup_lan.py PYTH-lan0
+
+# Towards POP
+ip address add dev pop200 fd00:200::2/48
+
+# Dual-homing rules
+ip -6 rule add from fd00:300:2::/48 to fd00:200:2::/48 pref 200 table main # Route normally internal connections
+ip -6 rule add from fd00:300:2::/48 to fd00:300:2::/48 pref 200 table main # Idem
+ip -6 rule add from fd00:300:2::/48 table dualhoming # Add source traffing rule for incoming 300 traffic
+ip -6 route add default via fd00:2:bc::b dev PYTH-eth0 table dualhoming # Redirect this traffic to HALL
+
+bird6 -s /tmp/PYTH.ctl
+# QoS
+./qos/qos.sh HALL PYTH-eth0 STEV PYTH-eth1 CARN PYTH-eth2
+
+# dhcp relay
+dhcrelay -q -6 -l PYTH-lan0.3 -l PYTH-lan0.2 -u fd00:200:2:103::1%PYTH-eth1 -u fd00:200:2:103::1%PYTH-eth2 -u fd00:200:2:204::1%PYTH-eth2 -u fd00:200:2:204::1%PYTH-eth1 --no-pid
+
+# Firewall
+firewall/PYTH.sh
+ulogd -d
+
+/usr/sbin/sshd
+
+#radvd
+radvd -n -C /etc/radvd.conf

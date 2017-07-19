@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ip link set dev SH4-eth0 up
+routing/setup_lan.py SH4-eth0
+
+(sleep 5 ; dhclient -6 SH4-eth0.4) &
+ulogd -d

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+ip link set dev MON1-eth0 up
+routing/setup_lan.py MON1-eth0
+
+/usr/sbin/sshd
+/usr/local/nginx/sbin/nginx -c /etc/nginx/nginx.conf
+ulogd -d
+
+sleep 100
+monitoring/failover.sh &
+monitoring/web.sh &

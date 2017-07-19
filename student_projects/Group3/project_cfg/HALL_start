@@ -1,0 +1,50 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see router_config_creation.py for details. 
+
+ip link set dev belneta up 
+ip address add dev belneta fd00:300::3/48  
+
+ip link set dev HALL-eth1 up 
+ip address add dev HALL-eth1 fd00:200:3:1::1/64 
+ip address add dev HALL-eth1 fd00:300:3:1::1/64 
+ip link set dev HALL-eth2 up 
+ip address add dev HALL-eth2 fd00:200:3:2::1/64 
+ip address add dev HALL-eth2 fd00:300:3:2::1/64 
+ip link set dev HALL-eth0 up 
+ip address add dev HALL-eth0 fd00:200:3:7::1/64 
+ip address add dev HALL-eth0 fd00:300:3:7::1/64 
+
+ip link set dev HALL-lan0 up 
+ip address add dev HALL-lan0 fd00:200:3:100::/64 
+ip address add dev HALL-lan0 fd00:300:3:100::/64 
+
+ip link set dev HALL-lan1 up 
+ip link add link HALL-lan1 name HALL-lan1.200 type vlan id 0x200 
+ip link set dev HALL-lan1.200 up 
+ip address add dev HALL-lan1.200 fd00:200:3:200::/64 
+ip address add dev HALL-lan1.200 fd00:300:3:200::/64 
+ip link add link HALL-lan1 name HALL-lan1.300 type vlan id 0x300 
+ip link set dev HALL-lan1.300 up 
+ip address add dev HALL-lan1.300 fd00:200:3:300::/64 
+ip address add dev HALL-lan1.300 fd00:300:3:300::/64 
+ip link add link HALL-lan1 name HALL-lan1.500 type vlan id 0x500 
+ip link set dev HALL-lan1.500 up 
+ip address add dev HALL-lan1.500 fd00:200:3:500::/64 
+ip address add dev HALL-lan1.500 fd00:300:3:500::/64 
+ip link add link HALL-lan1 name HALL-lan1.600 type vlan id 0x600 
+ip link set dev HALL-lan1.600 up 
+ip address add dev HALL-lan1.600 fd00:200:3:600::/64 
+ip address add dev HALL-lan1.600 fd00:300:3:600::/64 
+
+
+ip -6 rule add from fd00:200:3::/48 to fd00:200:3::/48 pref 1000 table main
+ip -6 rule add from fd00:200:3::/48 to fd00:300:3::/48 pref 1000 table main
+ip -6 route add ::/0 via fd00:200:3:1::2 dev HALL-eth1 metric 1 table 10
+ip -6 rule add from fd00:200:3::/48 pref 2000 table 10
+/usr/sbin/sshd
+/etc/routing/backup_link_switcher.sh &
+
+dhcrelay -q -pf /var/run/HALL_dhcrel -6  -l HALL-lan1.200 -l HALL-lan1.300 -l HALL-lan1.500 -l HALL-lan1.600 -u fd00:200:3:100::547%HALL-lan0 -u fd00:200:3:101::547%HALL-lan0 -u fd00:300:3:100::547%HALL-lan0 -u fd00:300:3:101::547%HALL-lan0 -u fd00:200:3:100::547%HALL-eth1 -u fd00:200:3:101::547%HALL-eth1 -u fd00:300:3:100::547%HALL-eth1 -u fd00:300:3:101::547%HALL-eth1 -u fd00:200:3:100::547%HALL-eth2 -u fd00:200:3:101::547%HALL-eth2 -u fd00:300:3:100::547%HALL-eth2 -u fd00:300:3:101::547%HALL-eth2 -u fd00:200:3:100::547%HALL-eth0 -u fd00:200:3:101::547%HALL-eth0 -u fd00:300:3:100::547%HALL-eth0 -u fd00:300:3:101::547%HALL-eth0
+bird6 -s /tmp/HALL.ctl -P /tmp/HALL_bird.pid 
+radvd -p /var/run/radvd/HALL_radvd.pid -C /etc/radvd/HALL.conf -m logfile -l /var/log/radvd/HALL.log

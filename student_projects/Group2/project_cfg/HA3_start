@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ip link set dev HA3-eth0 up
+routing/setup_lan.py HA3-eth0
+
+(sleep 5 ; dhclient -6 HA3-eth0.3) &
+ulogd -d

@@ -1,0 +1,37 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see router_config_creation.py for details. 
+
+
+ip link set dev CARN-eth1 up 
+ip address add dev CARN-eth1 fd00:200:3:5::4/64 
+ip address add dev CARN-eth1 fd00:300:3:5::4/64 
+ip link set dev CARN-eth0 up 
+ip address add dev CARN-eth0 fd00:200:3:4::4/64 
+ip address add dev CARN-eth0 fd00:300:3:4::4/64 
+
+
+ip link set dev CARN-lan0 up 
+ip link add link CARN-lan0 name CARN-lan0.203 type vlan id 0x203 
+ip link set dev CARN-lan0.203 up 
+ip address add dev CARN-lan0.203 fd00:200:3:203::/64 
+ip address add dev CARN-lan0.203 fd00:300:3:203::/64 
+ip link add link CARN-lan0 name CARN-lan0.303 type vlan id 0x303 
+ip link set dev CARN-lan0.303 up 
+ip address add dev CARN-lan0.303 fd00:200:3:303::/64 
+ip address add dev CARN-lan0.303 fd00:300:3:303::/64 
+ip link add link CARN-lan0 name CARN-lan0.503 type vlan id 0x503 
+ip link set dev CARN-lan0.503 up 
+ip address add dev CARN-lan0.503 fd00:200:3:503::/64 
+ip address add dev CARN-lan0.503 fd00:300:3:503::/64 
+ip link add link CARN-lan0 name CARN-lan0.603 type vlan id 0x603 
+ip link set dev CARN-lan0.603 up 
+ip address add dev CARN-lan0.603 fd00:200:3:603::/64 
+ip address add dev CARN-lan0.603 fd00:300:3:603::/64 
+
+
+/usr/sbin/sshd
+
+dhcrelay -q -pf /var/run/CARN_dhcrel -6  -l CARN-lan0.203 -l CARN-lan0.303 -l CARN-lan0.503 -l CARN-lan0.603 -u fd00:200:3:100::547%CARN-eth1 -u fd00:200:3:101::547%CARN-eth1 -u fd00:300:3:100::547%CARN-eth1 -u fd00:300:3:101::547%CARN-eth1 -u fd00:200:3:100::547%CARN-eth0 -u fd00:200:3:101::547%CARN-eth0 -u fd00:300:3:100::547%CARN-eth0 -u fd00:300:3:101::547%CARN-eth0
+bird6 -s /tmp/CARN.ctl -P /tmp/CARN_bird.pid 
+radvd -p /var/run/radvd/CARN_radvd.pid -C /etc/radvd/CARN.conf -m logfile -l /var/log/radvd/CARN.log

@@ -1,0 +1,3 @@
+# User type 0 is reserved for administrators. We allow any services to this type of user so any router
+# seeing a packet with source adress [[prefix_a]]:x000::/56 or [[prefix_b]]:x000::/56 will accept it 
+# (x is the zone. Below we need to enumerate all zones: 0x0 to 0xF)

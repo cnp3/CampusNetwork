@@ -1,0 +1,14 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see service_config_creation.py for details. 
+
+ip link set dev MONIT-eth0 up 
+ip address add dev MONIT-eth0 fd00:200:3:0ff::1/64 
+ip address add dev MONIT-eth0 fd00:300:3:0ff::1/64 
+
+ip -6 route add ::/0 via fd00:200:3:0ff:: 
+
+/etc/isp_status_check.sh &
+
+/etc/services_status_check.sh &
+

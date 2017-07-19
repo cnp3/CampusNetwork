@@ -1,0 +1,40 @@
+;
+; fd00:200:2::/48
+;
+; Zone file built with the IPv6 Reverse DNS zone builder
+; http://rdns6.com/
+;
+$TTL 1d ; Default TTL
+@   IN  SOA ns1.group2.ingi admin.group2.ingi (
+    2017041501  ; serial
+    1h      ; slave refresh interval
+    15m     ; slave retry interval
+    1w      ; slave copy expire time
+    1h      ; NXDOMAIN cache time
+    )
+
+;
+; domain name servers
+;
+@   IN  NS  ns1.group2.ingi.
+@   IN  NS  ns2.group2.ingi.
+
+; IPv6 PTR entries
+0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    sh1c.group2.ingi.
+0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.0.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    hall.group2.ingi.
+0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    pyth.group2.ingi.
+0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    stev.group2.ingi.
+0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0.2.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    carn.group2.ingi.
+0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5.0.2.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    mich.group2.ingi.
+1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    dhcp1.group2.ingi.
+1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0.2.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    dhcp2.group2.ingi.
+2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    ns1.group2.ingi.
+2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0.2.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    ns2.group2.ingi.
+3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    rns1.group2.ingi.
+3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0.2.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    rns2.group2.ingi.
+4.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    lb1.group2.ingi.
+4.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    lb2.group2.ingi.
+5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    web11.group2.ingi.
+6.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3.0.1.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    web12.group2.ingi.
+5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0.2.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    web21.group2.ingi.
+6.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.0.2.0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa.    IN    PTR    web22.group2.ingi.

@@ -1,0 +1,525 @@
+# The format of this file is documented in the dhcpd.leases(5) manual page.
+# This lease file was written by isc-dhcp-4.3.1
+
+server-duid "\000\001\000\001 bb:\276\366\363\\4\237";
+
+ia-na "S\037g\256\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:11:14;
+  iaaddr fd00:200:2:3000::1f {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:11:14;
+  }
+}
+
+ia-na "~[\233\332\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:28:04;
+  iaaddr fd00:200:2:4205::1e {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:28:04;
+  }
+}
+
+ia-na "\362\016\013r\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:10:51;
+  iaaddr fd00:200:2:2103::1d {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:10:51;
+  }
+}
+
+ia-na "\205\357(p\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:11:14;
+  iaaddr fd00:200:2:4001::19 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:11:14;
+  }
+}
+
+ia-na "o\346\246\314\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:20:03;
+  iaaddr fd00:200:2:3001::1d {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:20:03;
+  }
+}
+
+ia-na "\033\030Y\343\000\001\000\001 \216F\022\202\317\241lease6 {\012  intelease6 {\012  interface " {
+  cltt 6 2017/04/29 15:39:57;
+  iaaddr fd00:200:2:3001::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 03:39:57;
+  }
+}
+
+ia-na "L\0206\312\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:28:03;
+  iaaddr fd00:200:2:4001::18 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:28:03;
+  }
+}
+
+ia-na "\"P\322\346\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:19:36;
+  iaaddr fd00:200:2:3102::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:36;
+  }
+}
+
+ia-na ",\210\362j\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:19:19;
+  iaaddr fd00:200:2:2103::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:19;
+  }
+}
+
+ia-na "#\314N\376\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:11:19;
+  iaaddr fd00:200:2:2205::18 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:11:19;
+  }
+}
+
+ia-na "\037\3427\364\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:27:59;
+  iaaddr fd00:200:2:4000::1e {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:27:59;
+  }
+}
+
+ia-na "\230\036\257T\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:27:41;
+  iaaddr fd00:200:2:2103::18 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:27:41;
+  }
+}
+
+ia-na "Y\223\312n\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:28:01;
+  iaaddr fd00:200:2:3001::1e {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:28:01;
+  }
+}
+
+ia-na "\273\377\000\026\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:28:02;
+  iaaddr fd00:200:2:3000::1c {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:28:02;
+  }
+}
+
+ia-na "\353\237C8\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:27:41;
+  iaaddr fd00:200:2:1103::19 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:27:41;
+  }
+}
+
+ia-na "\264\345\370\246\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:28:05;
+  iaaddr fd00:200:2:2102::1e {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:28:05;
+  }
+}
+
+ia-na "\016iL\247\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:11:17;
+  iaaddr fd00:200:2:2102::1d {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:11:17;
+  }
+}
+
+ia-na "E\010o\271\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:19:37;
+  iaaddr fd00:200:2:2102::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:37;
+  }
+}
+
+ia-na "R\036V\363\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:11:19;
+  iaaddr fd00:200:2:4205::16 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:11:19;
+  }
+}
+
+ia-na "!\341\210\343\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:28:06;
+  iaaddr fd00:200:2:3102::18 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:28:06;
+  }
+}
+
+ia-na "\277m\361\021\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:10:52;
+  iaaddr fd00:200:2:1103::1b {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:10:52;
+  }
+}
+
+ia-na "\243\343\206+\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:19:33;
+  iaaddr fd00:200:2:4205::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:33;
+  }
+}
+
+ia-na "\277\337\2143\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:19:33;
+  iaaddr fd00:200:2:2205::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:33;
+  }
+}
+
+ia-na "\367\362|G\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:11:16;
+  iaaddr fd00:200:2:4000::1b {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:11:16;
+  }
+}
+
+ia-na "\037<\001\237\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:19:58;
+  iaaddr fd00:200:2:4000::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:58;
+  }
+}
+
+ia-na "\311\036H!\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:19:19;
+  iaaddr fd00:200:2:1103::1f {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:19;
+  }
+}
+
+ia-na "\247Q\217+\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:11:19;
+  iaaddr fd00:200:2:3102::14 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:11:19;
+  }
+}
+
+ia-na "\321Ng\003\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:11:15;
+  iaaddr fd00:200:2:3001::1a {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:11:15;
+  }
+}
+
+ia-na "\351P*\011\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:28:06;
+  iaaddr fd00:200:2:2205::1d {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:28:06;
+  }
+}
+
+ia-na "\322\217qs\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 16:19:32;
+  iaaddr fd00:200:2:4001::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:32;
+  }
+}
+
+ia-na "\010\201s$\000\001\000\001 \216F\022\202\317\241lease6 {\012  intelease6 {\012  interface " {
+  cltt 6 2017/04/29 16:19:59;
+  iaaddr fd00:200:2:3000::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 04:19:59;
+  }
+}
+
+ia-na "\006\374\241h\000\001\000\001 \216F\022\202\317\241lease6 {\012  intelease6 {\012  interface " {
+  cltt 6 2017/04/29 15:39:35;
+  iaaddr fd00:200:2:1103::20 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 03:39:35;
+  }
+}
+
+ia-na "^^\353\256\000\001\000\001 \216F\022\202\317\241lease6 {\012  intelease6 {\012  interface " {
+  cltt 6 2017/04/29 15:39:35;
+  iaaddr fd00:200:2:2103::1f {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 03:39:35;
+  }
+}
+
+ia-na "Q\200\333\366\000\001\000\001 \216F\022\202\317\241lease6 {\012  intelease6 {\012  interface " {
+  cltt 6 2017/04/29 15:39:37;
+  iaaddr fd00:200:2:3204::19 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 03:39:37;
+  }
+}
+
+ia-na "\274\007\277\022\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:26:50;
+  iaaddr fd00:200:2:1103::1c {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:26:50;
+  }
+}
+
+ia-na "\3244\222r\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:26:50;
+  iaaddr fd00:200:2:2103::1e {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:26:50;
+  }
+}
+
+ia-na ";\245\007\002\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:12;
+  iaaddr fd00:200:2:4000::16 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:12;
+  }
+}
+
+ia-na ";\245\007\002\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:12;
+  iaaddr fd00:200:2:4000::16 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:12;
+  }
+}
+
+ia-na "\242LY\226\000\001\000\001 \227\301\222\002\242\226YL\242" {
+  cltt 6 2017/04/29 21:27:13;
+  iaaddr fd00:200:2:3102::1c {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:13;
+  }
+}
+
+ia-na "\242LY\226\000\001\000\001 \227\301\222\002\242\226YL\242" {
+  cltt 6 2017/04/29 21:27:13;
+  iaaddr fd00:200:2:3102::1c {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:13;
+  }
+}
+
+ia-na "\320r\246\250\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:13;
+  iaaddr fd00:200:2:2205::1a {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:13;
+  }
+}
+
+ia-na "\320r\246\250\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:13;
+  iaaddr fd00:200:2:2205::1a {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:13;
+  }
+}
+
+ia-na "]\342\003\300\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:13;
+  iaaddr fd00:200:2:4001::1c {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:13;
+  }
+}
+
+ia-na "]\342\003\300\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:13;
+  iaaddr fd00:200:2:4001::1c {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:13;
+  }
+}
+
+ia-na "~q;:\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:14;
+  iaaddr fd00:200:2:3001::16 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:14;
+  }
+}
+
+ia-na "~q;:\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:14;
+  iaaddr fd00:200:2:3001::16 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:14;
+  }
+}
+
+ia-na "X\262h\257\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:14;
+  iaaddr fd00:200:2:4205::1a {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:14;
+  }
+}
+
+ia-na "X\262h\257\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:14;
+  iaaddr fd00:200:2:4205::1a {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:14;
+  }
+}
+
+ia-na "\374m\340\227\000\001\000\001 \227\301\222&<\227\340m\374" {
+  cltt 6 2017/04/29 21:27:15;
+  iaaddr fd00:200:2:2102::1c {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:15;
+  }
+}
+
+ia-na "\374m\340\227\000\001\000\001 \227\301\222&<\227\340m\374" {
+  cltt 6 2017/04/29 21:27:15;
+  iaaddr fd00:200:2:2102::1c {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:15;
+  }
+}
+
+ia-na "\330\266bL\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:37;
+  iaaddr fd00:200:2:3000::17 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:37;
+  }
+}
+
+ia-na "\330\266bL\000\001\000\001 \227yp:\0343\214\337\277" {
+  cltt 6 2017/04/29 21:27:37;
+  iaaddr fd00:200:2:3000::17 {
+    binding state active;
+    preferred-life 7200;
+    max-life 43200;
+    ends 0 2017/04/30 09:27:37;
+  }
+}
+

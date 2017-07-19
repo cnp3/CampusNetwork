@@ -1,0 +1,11 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see host_config_creation.py for details. 
+
+
+        ip link set dev ST2-eth0 up
+        ip link add link ST2-eth0 name ST2-eth0.302 type vlan id 0x302
+        ip link set dev ST2-eth0.302 up
+        
+        sleep 20; rdnssd -H /etc/rdnssd/merge-hook -u rdnssd -p /var/run/ST2_rdnssd.pid
+        

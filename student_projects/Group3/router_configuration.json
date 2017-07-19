@@ -1,0 +1,143 @@
+{
+  "HALL": {
+    "router_id": "1",
+    "default_bgp_prefix_to_advertise": "fd00:300:3::/52",
+    "eths": {
+      "eth0": "7",
+      "eth1": "1",
+      "eth2": "2"
+    },
+    "lans": {
+      "services": {
+        "lan0": "00"
+      }
+    },
+    "vlans": {
+      "lan1": "00"
+    },
+    "isp": {
+      "belneta": {
+        "asn": "300",
+        "name_bgp": "pop300",
+        "self_address": "fd00:300::3/48",
+        "peer_address": "fd00:300::b"
+      }
+    },
+    "bgp_peers": {},
+    "extra_ip_commands": [
+      "ip -6 rule add from fd00:200:3::/48 to fd00:200:3::/48 pref 1000 table main",
+      "ip -6 rule add from fd00:200:3::/48 to fd00:300:3::/48 pref 1000 table main",
+      "ip -6 route add ::/0 via fd00:200:3:1::2 dev HALL-eth1 metric 1 table 10",
+      "ip -6 rule add from fd00:200:3::/48 pref 2000 table 10",
+      "/usr/sbin/sshd",
+      "/etc/routing/backup_link_switcher.sh &"
+    ]
+  },
+  "PYTH": {
+    "router_id": "2",
+    "default_bgp_prefix_to_advertise": "fd00:200:3::/52",
+    "eths": {
+      "eth0": "1",
+      "eth1": "3",
+      "eth2": "2"
+    },
+    "lans": {
+      "infrastructure": {
+        "lan2": "ff"
+      },
+      "services": {
+        "lan0": "01"
+      }
+    },
+    "vlans": {
+      "lan1": "01"
+    },
+    "isp": {
+      "belnetb": {
+        "asn": "200",
+        "name_bgp": "pop200",
+        "self_address": "fd00:200::3/48",
+        "peer_address": "fd00:200::b"
+      }
+    },
+    "bgp_peers": {
+      "group1": {
+        "asn": "1",
+        "peer_address": "fd00:200::1",
+        "accepted_prefix": "fd00:200:1:1000::/52"
+      }
+    },
+    "extra_ip_commands": [
+      "ip -6 rule add from fd00:300:3::/48 to fd00:200:3::/48 pref 1000 table main",
+      "ip -6 rule add from fd00:300:3::/48 to fd00:300:3::/48 pref 1000 table main",
+      "ip -6 route add ::/0 via fd00:200:3:1::1 dev PYTH-eth0 metric 1 table 10",
+      "ip -6 rule add from fd00:300:3::/48 pref 2000 table 10",
+      "/usr/sbin/sshd",
+      "/etc/routing/backup_link_switcher.sh &"
+    ]
+  },
+  "STEV": {
+    "router_id": "3",
+    "eths": {
+      "eth0": "3",
+      "eth1": "4"
+    },
+    "lans": {},
+    "vlans": {
+      "lan0": "02"
+    },
+    "isp": {},
+    "bgp_peers": {},
+    "extra_ip_commands": [
+      "/usr/sbin/sshd"
+    ]
+  },
+  "CARN": {
+    "router_id": "4",
+    "eths": {
+      "eth0": "4",
+      "eth1": "5"
+    },
+    "lans": {},
+    "vlans": {
+      "lan0": "03"
+    },
+    "isp": {},
+    "bgp_peers": {},
+    "extra_ip_commands": [
+      "/usr/sbin/sshd"
+    ]
+  },
+  "MICH": {
+    "router_id": "5",
+    "eths": {
+      "eth0": "6",
+      "eth1": "5"
+    },
+    "lans": {},
+    "vlans": {
+      "lan0": "04"
+    },
+    "isp": {},
+    "bgp_peers": {},
+    "extra_ip_commands": [
+      "/usr/sbin/sshd"
+    ]
+  },
+  "SH1C": {
+    "router_id": "6",
+    "eths": {
+      "eth0": "6",
+      "eth1": "7"
+    },
+    "lans": {},
+    "vlans": {
+      "lan0": "05"
+    },
+    "isp": {},
+    "bgp_peers": {},
+    "extra_ip_commands": [
+      "/usr/sbin/sshd"
+    ]
+  }
+}

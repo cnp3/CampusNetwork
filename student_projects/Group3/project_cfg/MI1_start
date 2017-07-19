@@ -1,0 +1,11 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see host_config_creation.py for details. 
+
+
+        ip link set dev MI1-eth0 up
+        ip link add link MI1-eth0 name MI1-eth0.204 type vlan id 0x204
+        ip link set dev MI1-eth0.204 up
+        
+        sleep 20; dhclient -6 -pf /var/run/dhclient_MI1.pid -S MI1-eth0.204
+        

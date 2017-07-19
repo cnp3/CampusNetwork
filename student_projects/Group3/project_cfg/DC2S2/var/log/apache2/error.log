@@ -1,0 +1,301 @@
+[Mon Mar 13 07:42:26.104264 2017] [mpm_event:notice] [pid 2767:tid 139697038018432] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 13 07:42:26.104536 2017] [core:notice] [pid 2767:tid 139697038018432] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 13 08:02:08.019688 2017] [mpm_event:notice] [pid 2767:tid 139697038018432] AH00491: caught SIGTERM, shutting down
+[Mon Mar 13 08:05:07.169183 2017] [mpm_event:notice] [pid 2783:tid 140215436756864] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 13 08:05:07.169403 2017] [core:notice] [pid 2783:tid 140215436756864] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 13 08:21:07.063023 2017] [mpm_event:notice] [pid 2783:tid 140215436756864] AH00491: caught SIGTERM, shutting down
+[Mon Mar 13 08:22:28.062411 2017] [mpm_event:notice] [pid 2936:tid 140203188053888] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 13 08:22:28.062624 2017] [core:notice] [pid 2936:tid 140203188053888] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 13 08:27:35.712467 2017] [mpm_event:notice] [pid 2936:tid 140203188053888] AH00491: caught SIGTERM, shutting down
+[Mon Mar 13 08:27:55.440003 2017] [mpm_event:notice] [pid 5480:tid 140651783878528] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 13 08:27:55.440183 2017] [core:notice] [pid 5480:tid 140651783878528] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 13 09:07:23.709589 2017] [mpm_event:notice] [pid 5480:tid 140651783878528] AH00491: caught SIGTERM, shutting down
+[Wed Mar 15 15:01:43.305762 2017] [mpm_event:notice] [pid 2933:tid 140143254128512] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Mar 15 15:01:43.306991 2017] [core:notice] [pid 2933:tid 140143254128512] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Mar 15 15:04:31.638543 2017] [mpm_event:notice] [pid 2933:tid 140143254128512] AH00491: caught SIGTERM, shutting down
+[Wed Mar 15 15:09:11.046641 2017] [mpm_event:notice] [pid 2996:tid 139801173067648] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Mar 15 15:09:11.047002 2017] [core:notice] [pid 2996:tid 139801173067648] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Mar 15 15:11:16.157295 2017] [mpm_event:notice] [pid 2996:tid 139801173067648] AH00491: caught SIGTERM, shutting down
+[Wed Mar 15 15:54:36.136450 2017] [mpm_event:notice] [pid 2994:tid 139868929374080] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Mar 15 15:54:36.136785 2017] [core:notice] [pid 2994:tid 139868929374080] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Mar 15 15:55:58.660653 2017] [mpm_event:notice] [pid 2994:tid 139868929374080] AH00491: caught SIGTERM, shutting down
+[Wed Mar 15 16:10:33.678439 2017] [mpm_event:notice] [pid 2835:tid 140322048886656] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Mar 15 16:10:33.678741 2017] [core:notice] [pid 2835:tid 140322048886656] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Mar 15 16:12:54.953559 2017] [mpm_event:notice] [pid 2835:tid 140322048886656] AH00491: caught SIGTERM, shutting down
+[Wed Mar 15 17:14:52.806137 2017] [mpm_event:notice] [pid 2721:tid 140011811772288] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Mar 15 17:14:52.806840 2017] [core:notice] [pid 2721:tid 140011811772288] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Mar 15 17:16:05.009345 2017] [mpm_event:notice] [pid 2721:tid 140011811772288] AH00491: caught SIGTERM, shutting down
+[Wed Mar 15 17:20:47.862078 2017] [mpm_event:notice] [pid 3048:tid 140598761150336] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Mar 15 17:20:47.863158 2017] [core:notice] [pid 3048:tid 140598761150336] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Mar 15 17:21:45.076256 2017] [mpm_event:notice] [pid 3048:tid 140598761150336] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 11:11:14.678598 2017] [mpm_event:notice] [pid 3001:tid 140362644944768] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 11:11:14.679138 2017] [core:notice] [pid 3001:tid 140362644944768] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 11:12:32.639243 2017] [mpm_event:notice] [pid 3001:tid 140362644944768] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 11:30:43.616584 2017] [mpm_event:notice] [pid 2827:tid 140479945865088] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 11:30:43.616782 2017] [core:notice] [pid 2827:tid 140479945865088] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 11:32:52.221921 2017] [mpm_event:notice] [pid 2827:tid 140479945865088] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 11:45:27.712471 2017] [mpm_event:notice] [pid 3027:tid 140265894426496] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 11:45:27.712793 2017] [core:notice] [pid 3027:tid 140265894426496] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 11:48:09.020328 2017] [mpm_event:notice] [pid 3027:tid 140265894426496] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 11:57:30.873800 2017] [mpm_event:notice] [pid 2869:tid 139731633059712] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 11:57:30.874001 2017] [core:notice] [pid 2869:tid 139731633059712] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 11:57:59.239499 2017] [mpm_event:notice] [pid 2869:tid 139731633059712] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 12:02:46.244858 2017] [mpm_event:notice] [pid 2830:tid 140616551257984] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 12:02:46.245172 2017] [core:notice] [pid 2830:tid 140616551257984] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 12:03:28.757669 2017] [mpm_event:notice] [pid 2830:tid 140616551257984] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 12:17:10.223081 2017] [mpm_event:notice] [pid 2890:tid 140509270595456] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 12:17:10.223516 2017] [core:notice] [pid 2890:tid 140509270595456] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 12:18:03.230905 2017] [mpm_event:notice] [pid 2890:tid 140509270595456] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 12:37:47.581581 2017] [mpm_event:notice] [pid 2758:tid 139625642391424] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 12:37:47.582960 2017] [core:notice] [pid 2758:tid 139625642391424] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 12:38:15.653891 2017] [mpm_event:notice] [pid 2758:tid 139625642391424] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 12:51:51.736831 2017] [mpm_event:notice] [pid 2806:tid 139628136814464] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 12:51:51.742328 2017] [core:notice] [pid 2806:tid 139628136814464] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 12:54:12.310556 2017] [mpm_event:notice] [pid 2806:tid 139628136814464] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 13:05:28.337477 2017] [mpm_event:notice] [pid 2851:tid 140102920963968] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 13:05:28.337882 2017] [core:notice] [pid 2851:tid 140102920963968] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 13:11:37.288302 2017] [mpm_event:notice] [pid 2851:tid 140102920963968] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 13:24:57.132060 2017] [mpm_event:notice] [pid 2803:tid 140276426467200] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 13:24:57.132785 2017] [core:notice] [pid 2803:tid 140276426467200] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 13:27:08.143364 2017] [mpm_event:notice] [pid 2803:tid 140276426467200] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 13:38:01.317848 2017] [mpm_event:notice] [pid 2846:tid 140437152950144] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 13:38:01.318447 2017] [core:notice] [pid 2846:tid 140437152950144] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 13:41:21.570014 2017] [mpm_event:notice] [pid 2846:tid 140437152950144] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 13:45:02.957508 2017] [mpm_event:notice] [pid 2987:tid 140433306859392] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 13:45:02.959052 2017] [core:notice] [pid 2987:tid 140433306859392] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 13:46:06.397280 2017] [mpm_event:notice] [pid 2987:tid 140433306859392] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 13:47:48.257970 2017] [mpm_event:notice] [pid 2897:tid 140479796131712] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 13:47:48.258242 2017] [core:notice] [pid 2897:tid 140479796131712] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 13:51:33.712962 2017] [mpm_event:notice] [pid 2897:tid 140479796131712] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 14:53:43.518871 2017] [mpm_event:notice] [pid 2810:tid 140290168309632] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 14:53:43.519123 2017] [core:notice] [pid 2810:tid 140290168309632] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 14:55:11.988155 2017] [mpm_event:notice] [pid 2810:tid 140290168309632] AH00491: caught SIGTERM, shutting down
+[Thu Mar 16 14:57:46.122178 2017] [mpm_event:notice] [pid 2752:tid 140557183645568] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Mar 16 14:57:46.122367 2017] [core:notice] [pid 2752:tid 140557183645568] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Mar 16 14:58:29.197004 2017] [mpm_event:notice] [pid 2752:tid 140557183645568] AH00491: caught SIGTERM, shutting down
+[Mon Mar 20 01:10:00.272505 2017] [mpm_event:notice] [pid 2831:tid 140181770147712] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 20 01:10:00.273278 2017] [core:notice] [pid 2831:tid 140181770147712] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 20 01:16:46.323681 2017] [mpm_event:notice] [pid 2831:tid 140181770147712] AH00491: caught SIGTERM, shutting down
+[Mon Mar 20 01:19:08.020603 2017] [mpm_event:notice] [pid 2984:tid 140647697356672] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 20 01:19:08.021130 2017] [core:notice] [pid 2984:tid 140647697356672] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 20 01:21:36.862817 2017] [mpm_event:notice] [pid 2984:tid 140647697356672] AH00491: caught SIGTERM, shutting down
+[Mon Mar 20 01:34:35.065873 2017] [mpm_event:notice] [pid 2824:tid 140309523363712] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 20 01:34:35.066389 2017] [core:notice] [pid 2824:tid 140309523363712] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 20 01:35:45.236530 2017] [mpm_event:notice] [pid 2824:tid 140309523363712] AH00491: caught SIGTERM, shutting down
+[Mon Mar 20 02:14:01.617246 2017] [mpm_event:notice] [pid 2938:tid 140662793475968] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 20 02:14:01.617432 2017] [core:notice] [pid 2938:tid 140662793475968] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 20 02:15:09.241125 2017] [mpm_event:notice] [pid 2938:tid 140662793475968] AH00491: caught SIGTERM, shutting down
+[Mon Mar 20 02:17:13.667268 2017] [mpm_event:notice] [pid 2943:tid 139756953880448] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 20 02:17:13.667981 2017] [core:notice] [pid 2943:tid 139756953880448] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 20 02:18:10.939911 2017] [mpm_event:notice] [pid 2943:tid 139756953880448] AH00491: caught SIGTERM, shutting down
+[Mon Mar 20 02:23:21.004804 2017] [mpm_event:notice] [pid 2786:tid 139633742739328] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 20 02:23:21.008056 2017] [core:notice] [pid 2786:tid 139633742739328] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 20 02:24:07.092327 2017] [mpm_event:notice] [pid 2786:tid 139633742739328] AH00491: caught SIGTERM, shutting down
+[Mon Mar 20 02:26:08.022579 2017] [mpm_event:notice] [pid 2947:tid 140041768925056] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 20 02:26:08.022787 2017] [core:notice] [pid 2947:tid 140041768925056] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Mar 20 02:27:05.793039 2017] [mpm_event:notice] [pid 2947:tid 140041768925056] AH00491: caught SIGTERM, shutting down
+[Mon Mar 20 03:32:35.707144 2017] [mpm_event:notice] [pid 6177:tid 140237226682240] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Mar 20 03:32:35.707576 2017] [core:notice] [pid 6177:tid 140237226682240] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 22 12:58:00.130768 2017] [mpm_event:notice] [pid 23326:tid 139865921337216] AH00491: caught SIGTERM, shutting down
+[Sat Apr 22 12:58:24.028923 2017] [mpm_event:notice] [pid 27185:tid 140555435829120] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 22 12:58:24.029051 2017] [core:notice] [pid 27185:tid 140555435829120] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Apr 24 14:14:50.168690 2017] [core:warn] [pid 3282:tid 140376579053440] AH00098: pid file /etc/var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
+[Mon Apr 24 14:14:50.186323 2017] [mpm_event:notice] [pid 3282:tid 140376579053440] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Apr 24 14:14:50.186349 2017] [core:notice] [pid 3282:tid 140376579053440] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Apr 24 14:17:39.038291 2017] [mpm_event:notice] [pid 3282:tid 140376579053440] AH00491: caught SIGTERM, shutting down
+[Mon Apr 24 14:18:03.888485 2017] [mpm_event:notice] [pid 7432:tid 139978874689408] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Apr 24 14:18:03.888577 2017] [core:notice] [pid 7432:tid 139978874689408] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Apr 24 14:44:43.908886 2017] [mpm_event:notice] [pid 7432:tid 139978874689408] AH00491: caught SIGTERM, shutting down
+[Mon Apr 24 14:45:07.915814 2017] [mpm_event:notice] [pid 16663:tid 140314914654080] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Apr 24 14:45:07.915935 2017] [core:notice] [pid 16663:tid 140314914654080] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Apr 24 15:09:29.283642 2017] [mpm_event:notice] [pid 16663:tid 140314914654080] AH00491: caught SIGTERM, shutting down
+[Mon Apr 24 15:09:52.777639 2017] [mpm_event:notice] [pid 25396:tid 140677243807616] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Apr 24 15:09:52.777729 2017] [core:notice] [pid 25396:tid 140677243807616] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Apr 24 15:17:48.959534 2017] [mpm_event:notice] [pid 25396:tid 140677243807616] AH00491: caught SIGTERM, shutting down
+[Mon Apr 24 15:18:55.233755 2017] [mpm_event:notice] [pid 32529:tid 140208206788480] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Apr 24 15:18:55.233840 2017] [core:notice] [pid 32529:tid 140208206788480] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Apr 24 15:35:38.020452 2017] [mpm_event:notice] [pid 32529:tid 140208206788480] AH00491: caught SIGTERM, shutting down
+[Mon Apr 24 15:36:02.544221 2017] [mpm_event:notice] [pid 7795:tid 139903038199680] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Apr 24 15:36:02.544297 2017] [core:notice] [pid 7795:tid 139903038199680] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Apr 24 15:39:55.035355 2017] [mpm_event:notice] [pid 7795:tid 139903038199680] AH00491: caught SIGTERM, shutting down
+[Mon Apr 24 15:40:18.928297 2017] [mpm_event:notice] [pid 12069:tid 140271218800512] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Apr 24 15:40:18.928366 2017] [core:notice] [pid 12069:tid 140271218800512] AH00094: Command line: '/usr/sbin/apache2'
+[Mon Apr 24 15:56:31.430056 2017] [mpm_event:notice] [pid 12069:tid 140271218800512] AH00491: caught SIGTERM, shutting down
+[Mon Apr 24 15:56:54.637724 2017] [mpm_event:notice] [pid 20901:tid 140036240533376] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon Apr 24 15:56:54.637841 2017] [core:notice] [pid 20901:tid 140036240533376] AH00094: Command line: '/usr/sbin/apache2'
+[Tue Apr 25 15:52:49.810495 2017] [core:warn] [pid 3375:tid 139716526122880] AH00098: pid file /etc/var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
+[Tue Apr 25 15:52:49.811048 2017] [mpm_event:notice] [pid 3375:tid 139716526122880] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Tue Apr 25 15:52:49.811069 2017] [core:notice] [pid 3375:tid 139716526122880] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Apr 26 15:18:46.832773 2017] [core:warn] [pid 4825:tid 140306746505088] AH00098: pid file /etc/var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
+[Wed Apr 26 15:18:46.842776 2017] [mpm_event:notice] [pid 4825:tid 140306746505088] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Apr 26 15:18:46.842808 2017] [core:notice] [pid 4825:tid 140306746505088] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Apr 26 15:20:29.460236 2017] [mpm_event:notice] [pid 4825:tid 140306746505088] AH00491: caught SIGTERM, shutting down
+[Wed Apr 26 15:20:51.013550 2017] [mpm_event:notice] [pid 8980:tid 140227100538752] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Apr 26 15:20:51.013622 2017] [core:notice] [pid 8980:tid 140227100538752] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Apr 26 15:23:26.765105 2017] [mpm_event:notice] [pid 8980:tid 140227100538752] AH00491: caught SIGTERM, shutting down
+[Wed Apr 26 15:23:49.424266 2017] [mpm_event:notice] [pid 13518:tid 139928394934144] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Apr 26 15:23:49.424370 2017] [core:notice] [pid 13518:tid 139928394934144] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Apr 26 15:40:11.486730 2017] [mpm_event:notice] [pid 13518:tid 139928394934144] AH00491: caught SIGTERM, shutting down
+[Wed Apr 26 15:40:35.341105 2017] [mpm_event:notice] [pid 22495:tid 140590649321344] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Apr 26 15:40:35.341174 2017] [core:notice] [pid 22495:tid 140590649321344] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Apr 26 16:19:55.938150 2017] [mpm_event:notice] [pid 22495:tid 140590649321344] AH00491: caught SIGTERM, shutting down
+[Wed Apr 26 16:20:19.887842 2017] [mpm_event:notice] [pid 3609:tid 140147601377152] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Apr 26 16:20:19.888262 2017] [core:notice] [pid 3609:tid 140147601377152] AH00094: Command line: '/usr/sbin/apache2'
+[Wed Apr 26 16:21:37.569164 2017] [mpm_event:notice] [pid 4123:tid 140143351322496] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Wed Apr 26 16:21:37.569580 2017] [core:notice] [pid 4123:tid 140143351322496] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Apr 27 15:06:41.562876 2017] [mpm_event:notice] [pid 4123:tid 140143351322496] AH00491: caught SIGTERM, shutting down
+[Thu Apr 27 15:07:13.773366 2017] [mpm_event:notice] [pid 12419:tid 139797616097152] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Apr 27 15:07:13.773671 2017] [core:notice] [pid 12419:tid 139797616097152] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Apr 27 15:07:43.715727 2017] [mpm_event:notice] [pid 12419:tid 139797616097152] AH00491: caught SIGTERM, shutting down
+[Thu Apr 27 15:08:16.077055 2017] [mpm_event:notice] [pid 16785:tid 140569036507008] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Apr 27 15:08:16.077496 2017] [core:notice] [pid 16785:tid 140569036507008] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Apr 27 15:27:09.707452 2017] [core:warn] [pid 15137:tid 140350361601920] AH00098: pid file /etc/var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
+[Thu Apr 27 15:27:09.708386 2017] [mpm_event:notice] [pid 15137:tid 140350361601920] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Apr 27 15:27:09.708414 2017] [core:notice] [pid 15137:tid 140350361601920] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Apr 27 15:38:35.349358 2017] [mpm_event:notice] [pid 15137:tid 140350361601920] AH00491: caught SIGTERM, shutting down
+[Thu Apr 27 15:38:58.193924 2017] [mpm_event:notice] [pid 21453:tid 139639597238144] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Apr 27 15:38:58.194008 2017] [core:notice] [pid 21453:tid 139639597238144] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Apr 27 16:07:14.282393 2017] [mpm_event:notice] [pid 21453:tid 139639597238144] AH00491: caught SIGTERM, shutting down
+[Thu Apr 27 16:07:38.050631 2017] [mpm_event:notice] [pid 31802:tid 140701578700672] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Apr 27 16:07:38.050700 2017] [core:notice] [pid 31802:tid 140701578700672] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Apr 27 16:09:16.559306 2017] [mpm_event:notice] [pid 31802:tid 140701578700672] AH00491: caught SIGTERM, shutting down
+[Thu Apr 27 16:09:39.546279 2017] [mpm_event:notice] [pid 3614:tid 140371512821632] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Apr 27 16:09:39.546429 2017] [core:notice] [pid 3614:tid 140371512821632] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Apr 27 16:10:54.133326 2017] [mpm_event:notice] [pid 3614:tid 140371512821632] AH00491: caught SIGTERM, shutting down
+[Thu Apr 27 16:11:17.533871 2017] [mpm_event:notice] [pid 7760:tid 140202720233344] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Apr 27 16:11:17.534006 2017] [core:notice] [pid 7760:tid 140202720233344] AH00094: Command line: '/usr/sbin/apache2'
+[Thu Apr 27 16:13:19.442645 2017] [mpm_event:notice] [pid 7760:tid 140202720233344] AH00491: caught SIGTERM, shutting down
+[Thu Apr 27 16:13:42.902303 2017] [mpm_event:notice] [pid 12070:tid 140369288902528] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Thu Apr 27 16:13:42.902366 2017] [core:notice] [pid 12070:tid 140369288902528] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 11:22:15.778970 2017] [core:warn] [pid 3339:tid 140693475944320] AH00098: pid file /etc/var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
+[Sat Apr 29 11:22:15.796974 2017] [mpm_event:notice] [pid 3339:tid 140693475944320] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 11:22:15.797004 2017] [core:notice] [pid 3339:tid 140693475944320] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 12:36:02.527313 2017] [mpm_event:notice] [pid 3339:tid 140693475944320] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 12:36:26.511757 2017] [mpm_event:notice] [pid 22839:tid 140465419999104] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 12:36:26.511834 2017] [core:notice] [pid 22839:tid 140465419999104] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 12:44:37.114285 2017] [mpm_event:notice] [pid 22839:tid 140465419999104] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 12:45:21.402041 2017] [mpm_event:notice] [pid 30694:tid 139761616320384] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 12:45:21.402103 2017] [core:notice] [pid 30694:tid 139761616320384] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 12:46:01.937374 2017] [mpm_event:notice] [pid 30694:tid 139761616320384] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 12:46:25.362627 2017] [mpm_event:notice] [pid 2133:tid 140032829273984] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 12:46:25.362688 2017] [core:notice] [pid 2133:tid 140032829273984] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 12:56:14.283498 2017] [mpm_event:notice] [pid 2133:tid 140032829273984] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 12:56:38.153944 2017] [mpm_event:notice] [pid 8100:tid 139956444362624] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 12:56:38.154032 2017] [core:notice] [pid 8100:tid 139956444362624] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 12:57:06.702437 2017] [mpm_event:notice] [pid 8100:tid 139956444362624] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 12:57:29.765030 2017] [mpm_event:notice] [pid 12019:tid 139915961763712] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 12:57:29.765106 2017] [core:notice] [pid 12019:tid 139915961763712] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 12:58:36.793388 2017] [mpm_event:notice] [pid 12019:tid 139915961763712] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 12:59:00.810536 2017] [mpm_event:notice] [pid 15954:tid 140692234082176] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 12:59:00.810608 2017] [core:notice] [pid 15954:tid 140692234082176] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 12:59:06.146115 2017] [mpm_event:notice] [pid 15954:tid 140692234082176] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 12:59:29.841993 2017] [mpm_event:notice] [pid 19715:tid 140360358975360] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 12:59:29.842060 2017] [core:notice] [pid 19715:tid 140360358975360] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 12:59:56.680538 2017] [mpm_event:notice] [pid 19715:tid 140360358975360] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:00:20.461490 2017] [mpm_event:notice] [pid 23819:tid 140695808776064] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:00:20.461565 2017] [core:notice] [pid 23819:tid 140695808776064] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:10:24.200684 2017] [mpm_event:notice] [pid 23819:tid 140695808776064] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:10:46.790432 2017] [mpm_event:notice] [pid 30496:tid 140484034230144] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:10:46.790499 2017] [core:notice] [pid 30496:tid 140484034230144] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:11:17.412568 2017] [mpm_event:notice] [pid 30496:tid 140484034230144] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:11:40.123639 2017] [mpm_event:notice] [pid 2096:tid 139717907888000] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:11:40.123718 2017] [core:notice] [pid 2096:tid 139717907888000] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:12:32.946498 2017] [mpm_event:notice] [pid 2096:tid 139717907888000] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:12:55.048555 2017] [mpm_event:notice] [pid 5904:tid 140560378185600] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:12:55.048635 2017] [core:notice] [pid 5904:tid 140560378185600] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:14:53.537028 2017] [mpm_event:notice] [pid 5904:tid 140560378185600] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:15:16.274802 2017] [mpm_event:notice] [pid 10135:tid 140407678818176] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:15:16.274895 2017] [core:notice] [pid 10135:tid 140407678818176] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:18:13.932499 2017] [mpm_event:notice] [pid 10135:tid 140407678818176] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:18:36.656764 2017] [mpm_event:notice] [pid 14420:tid 139839435122560] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:18:36.656834 2017] [core:notice] [pid 14420:tid 139839435122560] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:22:53.823526 2017] [mpm_event:notice] [pid 14420:tid 139839435122560] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:23:17.020427 2017] [mpm_event:notice] [pid 19160:tid 140309519771520] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:23:17.020490 2017] [core:notice] [pid 19160:tid 140309519771520] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:23:44.035143 2017] [mpm_event:notice] [pid 19160:tid 140309519771520] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:24:06.977589 2017] [mpm_event:notice] [pid 23036:tid 140602863548288] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:24:06.977658 2017] [core:notice] [pid 23036:tid 140602863548288] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:25:31.074829 2017] [mpm_event:notice] [pid 23036:tid 140602863548288] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:25:54.101899 2017] [mpm_event:notice] [pid 27134:tid 139813079107456] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:25:54.101968 2017] [core:notice] [pid 27134:tid 139813079107456] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:26:03.609342 2017] [mpm_event:notice] [pid 27134:tid 139813079107456] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:26:26.423385 2017] [mpm_event:notice] [pid 30923:tid 140702357235584] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:26:26.423454 2017] [core:notice] [pid 30923:tid 140702357235584] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:26:43.582987 2017] [mpm_event:notice] [pid 30923:tid 140702357235584] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:27:05.957515 2017] [mpm_event:notice] [pid 2332:tid 140248518272896] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:27:05.957587 2017] [core:notice] [pid 2332:tid 140248518272896] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:27:22.423847 2017] [mpm_event:notice] [pid 2332:tid 140248518272896] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:27:45.481835 2017] [mpm_event:notice] [pid 6236:tid 140170620987264] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:27:45.481932 2017] [core:notice] [pid 6236:tid 140170620987264] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:28:59.171738 2017] [mpm_event:notice] [pid 6236:tid 140170620987264] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:29:22.042027 2017] [mpm_event:notice] [pid 10357:tid 140026761754496] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:29:22.042095 2017] [core:notice] [pid 10357:tid 140026761754496] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:29:34.777295 2017] [mpm_event:notice] [pid 10357:tid 140026761754496] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:29:57.846969 2017] [mpm_event:notice] [pid 14019:tid 140441893169024] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:29:57.847075 2017] [core:notice] [pid 14019:tid 140441893169024] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:45:28.553843 2017] [mpm_event:notice] [pid 14019:tid 140441893169024] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:45:51.246236 2017] [mpm_event:notice] [pid 21244:tid 140392616736640] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:45:51.246299 2017] [core:notice] [pid 21244:tid 140392616736640] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 13:56:30.922687 2017] [mpm_event:notice] [pid 21244:tid 140392616736640] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 13:56:53.502296 2017] [mpm_event:notice] [pid 27392:tid 140637897422720] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 13:56:53.502368 2017] [core:notice] [pid 27392:tid 140637897422720] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 14:11:24.430051 2017] [mpm_event:notice] [pid 27392:tid 140637897422720] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 14:11:49.119036 2017] [mpm_event:notice] [pid 2640:tid 139668327827328] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 14:11:49.119114 2017] [core:notice] [pid 2640:tid 139668327827328] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 14:28:14.444029 2017] [mpm_event:notice] [pid 2640:tid 139668327827328] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 14:28:38.371534 2017] [mpm_event:notice] [pid 10558:tid 140469505968000] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 14:28:38.371618 2017] [core:notice] [pid 10558:tid 140469505968000] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 15:16:32.381643 2017] [mpm_event:notice] [pid 10558:tid 140469505968000] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 15:16:55.201729 2017] [mpm_event:notice] [pid 25405:tid 140174395770752] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 15:16:55.201823 2017] [core:notice] [pid 25405:tid 140174395770752] AH00094: Command line: '/usr/sbin/apache2'
+[Sat Apr 29 15:27:48.847530 2017] [mpm_event:notice] [pid 25405:tid 140174395770752] AH00491: caught SIGTERM, shutting down
+[Sat Apr 29 15:28:12.014445 2017] [mpm_event:notice] [pid 32490:tid 139869108893568] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sat Apr 29 15:28:12.014519 2017] [core:notice] [pid 32490:tid 139869108893568] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 11:19:36.826002 2017] [core:warn] [pid 8814:tid 140072672954240] AH00098: pid file /etc/var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
+[Sun Apr 30 11:19:36.826659 2017] [mpm_event:notice] [pid 8814:tid 140072672954240] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 11:19:36.826684 2017] [core:notice] [pid 8814:tid 140072672954240] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 11:26:38.929221 2017] [mpm_event:notice] [pid 8814:tid 140072672954240] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 13:42:24.112981 2017] [mpm_event:notice] [pid 3194:tid 139752683804544] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 13:42:24.121478 2017] [core:notice] [pid 3194:tid 139752683804544] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 13:49:38.639152 2017] [mpm_event:notice] [pid 3194:tid 139752683804544] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 13:50:01.948712 2017] [mpm_event:notice] [pid 9511:tid 139829953333120] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 13:50:01.948779 2017] [core:notice] [pid 9511:tid 139829953333120] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 13:51:39.096941 2017] [mpm_event:notice] [pid 9511:tid 139829953333120] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 13:52:08.245689 2017] [mpm_event:notice] [pid 13912:tid 140491712845696] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 13:52:08.245774 2017] [core:notice] [pid 13912:tid 140491712845696] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 15:38:10.573724 2017] [mpm_event:notice] [pid 13912:tid 140491712845696] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 15:38:35.672470 2017] [mpm_event:notice] [pid 9467:tid 140339392472960] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 15:38:35.672542 2017] [core:notice] [pid 9467:tid 140339392472960] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 15:49:46.177082 2017] [mpm_event:notice] [pid 9467:tid 140339392472960] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 15:50:10.903779 2017] [mpm_event:notice] [pid 20235:tid 139975508129664] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 15:50:10.903912 2017] [core:notice] [pid 20235:tid 139975508129664] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 16:40:24.056896 2017] [mpm_event:notice] [pid 20235:tid 139975508129664] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 16:40:49.293567 2017] [mpm_event:notice] [pid 4273:tid 139963453831040] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 16:40:49.293738 2017] [core:notice] [pid 4273:tid 139963453831040] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 18:41:04.467740 2017] [core:warn] [pid 3329:tid 139629917165440] AH00098: pid file /etc/var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
+[Sun Apr 30 18:41:04.474917 2017] [mpm_event:notice] [pid 3329:tid 139629917165440] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 18:41:04.474945 2017] [core:notice] [pid 3329:tid 139629917165440] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 18:57:19.434557 2017] [mpm_event:notice] [pid 3329:tid 139629917165440] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 18:57:42.314991 2017] [mpm_event:notice] [pid 10526:tid 139758380136320] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 18:57:42.315058 2017] [core:notice] [pid 10526:tid 139758380136320] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 18:59:28.057567 2017] [mpm_event:notice] [pid 10526:tid 139758380136320] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 18:59:51.415243 2017] [mpm_event:notice] [pid 14701:tid 140144505333632] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 18:59:51.415317 2017] [core:notice] [pid 14701:tid 140144505333632] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 20:48:13.606136 2017] [mpm_event:notice] [pid 14701:tid 140144505333632] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 20:48:36.744730 2017] [mpm_event:notice] [pid 8947:tid 140188158560128] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 20:48:36.744792 2017] [core:notice] [pid 8947:tid 140188158560128] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 22:14:15.233255 2017] [mpm_event:notice] [pid 8947:tid 140188158560128] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 22:14:38.765440 2017] [mpm_event:notice] [pid 12823:tid 140349305153408] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 22:14:38.765519 2017] [core:notice] [pid 12823:tid 140349305153408] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 23:28:08.728672 2017] [mpm_event:notice] [pid 12823:tid 140349305153408] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 23:28:33.167247 2017] [mpm_event:notice] [pid 21747:tid 140695276914560] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 23:28:33.167384 2017] [core:notice] [pid 21747:tid 140695276914560] AH00094: Command line: '/usr/sbin/apache2'
+[Sun Apr 30 23:41:29.265248 2017] [mpm_event:notice] [pid 21747:tid 140695276914560] AH00491: caught SIGTERM, shutting down
+[Sun Apr 30 23:41:52.250179 2017] [mpm_event:notice] [pid 15022:tid 140074408322944] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Sun Apr 30 23:41:52.250279 2017] [core:notice] [pid 15022:tid 140074408322944] AH00094: Command line: '/usr/sbin/apache2'
+[Mon May 01 00:06:32.234281 2017] [core:warn] [pid 15954:tid 139672174172032] AH00098: pid file /etc/var/run/apache2/apache2.pid overwritten -- Unclean shutdown of previous Apache run?
+[Mon May 01 00:06:32.235818 2017] [mpm_event:notice] [pid 15954:tid 139672174172032] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon May 01 00:06:32.235846 2017] [core:notice] [pid 15954:tid 139672174172032] AH00094: Command line: '/usr/sbin/apache2'
+[Mon May 01 00:07:27.833973 2017] [mpm_event:notice] [pid 15954:tid 139672174172032] AH00491: caught SIGTERM, shutting down
+[Mon May 01 00:07:50.911208 2017] [mpm_event:notice] [pid 20408:tid 139644411242368] AH00489: Apache/2.4.10 (Debian) configured -- resuming normal operations
+[Mon May 01 00:07:50.911268 2017] [core:notice] [pid 20408:tid 139644411242368] AH00094: Command line: '/usr/sbin/apache2'

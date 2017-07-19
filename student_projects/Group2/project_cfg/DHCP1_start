@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ip link set dev DHCP1-eth0 up
+routing/setup_lan.py DHCP1-eth0
+/usr/sbin/dhcpd -6 -cf /etc/dhcp/dhcp6.conf -lf /etc/dhcp/dhcpd6.leases DHCP1-eth0 --no-pid
+
+/usr/sbin/sshd
+
+ulogd -d
+#firewall/ST-DHCP.sh

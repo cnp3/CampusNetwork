@@ -1,0 +1,8 @@
+ip6tables -A FORWARD --src [[prefix_b]]:[[zone]]300::/56 -p tcp --match multiport --dports 53,2100,5001,5060,5061 -j ACCEPT -m comment --comment "user type: 3"
+ip6tables -A FORWARD --src [[prefix_a]]:[[zone]]300::/56 -p tcp --match multiport --dports 53,2100,5001,5060,5061 -j ACCEPT -m comment --comment "user type: 3" 
+ip6tables -A FORWARD --src [[prefix_a]]:[[zone]]300::/56 -p udp --match multiport --dports 53,5060,5061 -j ACCEPT -m comment --comment "user type: 3" 
+ip6tables -A FORWARD --src [[prefix_b]]:[[zone]]300::/56 -p udp --match multiport --dports 53,5060,5061 -j ACCEPT -m comment --comment "user type: 3"
+ip6tables -A FORWARD --src [[prefix_a]]:[[zone]]300::/56 -p tcp --dport 2200:2299 -j ACCEPT -m comment --comment "user type: 3" 
+ip6tables -A FORWARD --src [[prefix_b]]:[[zone]]300::/56 -p tcp --dport 2200:2299 -j ACCEPT -m comment --comment "user type: 3" 
+ip6tables -A FORWARD --src [[prefix_a]]:[[zone]]300::/56 -p udp --dport 16384:32767 -j ACCEPT -m comment --comment "user type: 3" 
+ip6tables -A FORWARD --src [[prefix_b]]:[[zone]]300::/56 -p udp --dport 16384:32767 -j ACCEPT -m comment --comment "user type: 3" 

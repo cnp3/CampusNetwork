@@ -1,0 +1,207 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[margin=2cm]{geometry} % 'normal' margin
+\usepackage[T1]{fontenc} % encoding in the pdf, T1 for french
+\usepackage[utf8]{inputenc} % encoding of this file
+\usepackage{fancyhdr} % custom headers
+\usepackage{hyperref} % hyperlink/clickable
+\usepackage{amssymb} % we need the square symbol
+\usepackage{enumitem} % custom enumeration
+\newlist{checklist}{itemize}{2} % max-depth 2
+\setlist[checklist]{label=$\square$}
+
+%% Document properties
+\def\mytitle{Group project submission instructions}\title{\mytitle}
+\def\mydate{Mar. 2017}\date{\mydate}
+\def\myauthor{LINGI2142}\author{\myauthor}
+
+%% Headers
+\lfoot{} % nothing in bottom left
+\cfoot{} % nothing in bottom center
+\rfoot{\thepage} % page in bottom right
+\lhead{% course id in top left
+    \large
+    \href{https://moodleucl.uclouvain.be/course/view.php?id=9209
+         }{\myauthor-- Computer networks: configuration and management}
+}
+\chead{} % nothing in top center
+\rhead{% date in top right
+    \large\mydate%
+}
+
+\begin{document}
+\rmfamily % roman font
+\pagestyle{fancy} % Custom header on all pages
+
+\begin{center}
+    \huge\bfseries\mytitle%
+    \vspace{1ex}
+\end{center} % title
+
+\section{Deliverables}
+The project submission is split in four deliverables.
+\begin{description}
+    \item[Archive of the project] We expect to receive
+        an \textbf{archive} containing \textbf{every script} used to start the network (this
+        includes all provided scripts), to test it. It should also contain a
+        short README indicating how to start the network, and how should the
+        test scripts be run and what should be expected from them.
+        You \textbf{must comment/justify} every part of your \textbf{configuration
+        files}, as well as mention the \textbf{default values} used if you rely
+        on them.
+    \item[Project report] We expect a short report (.pdf's only), containing:
+        \begin{itemize}
+            \item \textbf{A per-group introduction}, which presents the addressing plan
+                used in the network and its rationale, topology
+                changes, \dots 
+            \item \textbf{Individual sections with author names}
+                on the individual design tasks. These sections should focus on
+                the high-level objectives that were implemented (e.g.\ security
+                policy, queuing tree, combination of load-balancing
+                techniques), their actual implementation overview, the tests
+                that were realized to ensure the correctness of the
+                implementation as well as a discussion on the extensibility of
+                the approach (e.g.\ steps to add a new router/server/host).
+        \end{itemize}
+        Do not forget to \textbf{provide your sources} towards the readings you made in
+        order to discover the usual practice when configuring a network!
+    \item[Individual reviews] Each group will receive the projects of two other
+        groups. Each group member then will have to \textbf{write a review on} both
+        projects on \textbf{the same task that he implemented} in his project (or on the
+        introduction/addressing plan if the group did not do it). E.g.\ a
+        student that implemented routing will write 2 reviews on routing; a
+        student that implemented monitoring might write 1 review on monitoring
+        and 1 on the introduction/addressing plan.
+    \item[Changelog] Based on the received reviews, each group will have time
+        to improve some aspect of its project. Each \textbf{change must be
+        documented and justified} in a global changelog for the project (a file
+        describing what has been changed, how, and why). The final version of
+        your project will consist on an archive of your project script, as well
+        as this changelog.
+\end{description}
+
+\section{Submission schedule}
+All submissions and reviews will be made on HotCRP
+(\url{https://hotcrp.info.ucl.ac.be/LINGI2142/}). Please create an account
+there using you \textbf{@student.uclouvain.be} email address! 
+\begin{description}
+    \item[20/03--First version of the project and report] There should only be
+        \textbf{one submission per group}. The submission will be opened
+        until 11.59am. Make sure to enter all author names and student email
+        addresses (as this will create accounts on the fly if not yet done).
+    \item[01/04--Individual reviews] We will notify you when the reviews have
+        been assigned. \textbf{Each group member} will encode its own reviews
+        on \textbf{HotCRP}. You will receive an email containing the needed
+        login information.
+    \item[01/05--Final version of the project and changelog] As before, only
+        \textbf{one submission for the whole group}, but this this on
+        \textbf{Moodle}.
+\end{description}
+
+\section{Grading}
+The project is worth 40\% of the course grades. These are allocated as:
+\begin{itemize}
+    \item Individual review: 10\%. We will rate whether your reviews are
+        consistent with the project itself (i.e.\ don't say `this project is
+        terrible' if this is not the case), whether you backed up all claims, how
+        complete were you in the review process (did you read the report? Read
+        the relevant configuration files? Executed some tests of your own?
+        \dots)
+    \item Individual task: 15\%. We will rate your individual section in the
+        report as well as your actual implementation and generated
+        configuration files.
+    \item Group: 15\%. This an average of every group member individual task
+        grade, as well as an appreciation of the group section in the report.
+\end{itemize}
+
+\section{Sample feature sets}
+Below are examples features that should be implemented in your network to get
+it to run properly, as well as be tested
+(i.e.\ each feature should have an associated test script)!
+
+\subsection{Routing}
+\begin{checklist}
+    \item Your intra-domain routing protocol distributes routes for both
+        prefixes assigned to your network.
+    \item You export the appropriate prefix to each provider over BGP.\@
+    \item Every host/router/server inside the network can communicate with 
+        every other node in the network, and has internet access, provided the 
+        security policies allow it.
+    \item Your network can survive any link or router failure automatically
+        (test this by bringing interface down on routers or by killing all
+        routing daemons on a given router).
+\end{checklist}
+
+\subsection{Security}
+\begin{checklist}
+    \item You implemented policies that forbid some traffic from leaving the
+        network (e.g.\ cameras) or enter it (e.g.\ RPF check, incoming
+        connections towards non-servers) or instead white list it (e.g.\ DNS
+        queries).
+    \item You implemented access-control policies inside the network to
+        explicitly allow or deny some connections (e.g.\ student-to-student
+        connections, access to routers)
+    \item You rules take into account the fact that hosts are dual-homed, and
+        use dynamic addresses.
+    \item You properly restrict the scope of some traffic (e.g.\ routing
+        protocol messages should never be seen on non router-to-router links).
+\end{checklist}
+
+\subsection{End-user management}
+\begin{checklist}
+    \item Your DNS server acts as forwarder toward \texttt{fd00:{}:d} and is
+        authoritative on the zone \texttt{groupX.ingi}.
+    \item All routers/servers should have an associated AAAA/PTR record for
+        their \texttt{groupX.ingi} FQDN.\@
+    \item Non-infrastructure hosts receive automatically multiple IPv6
+        addresses, information on where is the DNS server, and default routes.
+        (define in
+        the configuration file the user-type, thus provision statically the
+        correct VLAN).
+    \item Your setup is resilient to any single link or node failure (i.e.\
+        you have at least 2 instances of everything at separate locations).
+\end{checklist}
+
+\subsection{Services}
+\begin{checklist}
+    \item Your configured SSH servers on multiple hosts (at least on all
+        routers/servers), with different keys, and specific authorized\_keys
+        file.
+    \item Your network has dual-homed web servers serving static pages.
+    \item Your web servers are behind a load-balancer.
+    \item Your setup is resilient to any single link or node failures (i.e.\
+        you have at least 2 instances of everything at separate locations).
+\end{checklist}
+
+\subsection{QoS}
+\begin{checklist}
+    \item You provide some guarantees on the QoS applied to traffic depending
+        on its class (e.g.\ mission critical traffic is never dropped nor
+        queued, inter data-center traffic will not never be dropped be can be
+        queued, traffic towards the commercial internet has a best-effort
+        service).
+    \item Your queuing policies never cause a traffic flow to be shaped/policed
+        if there is free bandwidth available (i.e.\ if theres is only one active
+        users, it should be able to use the full network bandwidth).
+    \item Your queuing policies handle both burst traffic (i.e.\ HTTP
+        request/response) as well a long-lived flow (i.e.\ file transfer).
+    \item Your queuing policies try to minimize starvation where possible
+        (i.e.\ if two flows have the same class/priority, both should get
+        \emph{some} bandwidth--even if they both cause their class to exceed
+        its reserved bandwidth).
+\end{checklist}
+
+\subsection{Monitoring}
+\begin{checklist}
+    \item You configured a monitoring infrastructure, with dedicated servers.
+    \item You collect on those servers statistics from the routers (e.g.\ SNMP
+        counters, netflow data), logs from the servers/routers (e.g.\ program
+        logs, syslog).
+    \item You have scripts on the monitoring server that can report on the
+        status of services in the network (e.g.\ list whether all service
+        instances are alive, their current load, firewall alerts/drop counters)
+    \item Your setup is resilient to any single link or node failures (i.e.\
+        you have at least 2 instances of everything at separate locations).
+\end{checklist}
+
+\end{document}

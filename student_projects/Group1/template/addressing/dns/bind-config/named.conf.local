@@ -1,0 +1,62 @@
+//
+// Do any local configuration here
+//
+
+// This view will be used for the requests coming from the inside of our network.
+// It contains all possible records including AAAA and PTR records concerning the
+// routers of our infrastructure.
+view "private-network-view" {
+	// Ensure that this view is served only to the clients of our private network
+	// and not the outside of this network.
+	match-clients { fd00:200:1::/48; fd00:300:1::/48;};
+	// Announce the zone group1.ingi., with the db.ingi.private zone file, 
+	// which contains all the possible AAAA records we have.
+	zone "group1.ingi" IN {
+		type master;
+		file "/etc/bind/db.ingi.private";
+	};
+	
+	// Declare the reverse DNS zone, for all the nodes, prefix 200
+	zone "[[reverse_name_200]]"                                                 
+	{       
+		type master;
+		file "/etc/bind/reverse/db.ingi.private.200.reverse";                                                   
+	};
+	
+	// Declare the reverse DNS zone, for all the  nodes, prefix 300
+	zone "[[reverse_name_300]]"                                                 
+	{       
+		type master;
+		file "/etc/bind/reverse/db.ingi.private.300.reverse";                                                   
+	};
+};
+
+// This view will be used for the requests coming from the outside of our network.
+// It does not contain the records AAAA concerning our routers and it does not contain
+// any PTR record.
+view "public-network-view" {
+	// We here match any client, i.e. any client that does not match the private-network-view.
+	match-clients { any; };
+	// Announce the zone group1.ingi., with the db.ingi.public zone file, 
+	// which contains does not contains private records like the records 
+	// concerning our routers.
+	zone "group1.ingi" IN {
+		type master;
+		file "/etc/bind/db.ingi.public";
+	};
+	
+	// Declare the reverse DNS zone, for all the public nodes, prefix 200
+	zone "[[reverse_name_200]]"                                                 
+	{       
+		type master;
+		file "/etc/bind/reverse/db.ingi.public.200.reverse";                                                   
+	};
+	
+	// Declare the reverse DNS zone, for all the public nodes, prefix 300
+	zone "[[reverse_name_300]]"                                                 
+	{       
+		type master;
+		file "/etc/bind/reverse/db.ingi.public.300.reverse";                                                   
+	};
+};
+

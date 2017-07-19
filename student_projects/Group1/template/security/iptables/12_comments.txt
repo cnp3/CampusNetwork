@@ -1,0 +1,6 @@
+
+# Below we open for server the access to different services. See the report
+# for more exlainations about rights attributed for the different user types.
+# We allow in output from servers : TCP 22,25,53,80,110,143,220,443,993,995,5001
+# UDP : 53
+# note : TCP 5001 is open for experimental purpose.

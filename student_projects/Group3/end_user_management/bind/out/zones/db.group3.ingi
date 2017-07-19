@@ -1,0 +1,19 @@
+$TTL 10800
+@   IN SOA  @ group3.ingi.(
+            2017050100   ; serial
+            7200    ; refresh  (  2   hours)
+            900     ; retry    (  15  min)
+            1209600 ; expire   (  2   weeks)
+            1800 )  ; minimum  (  30  min)
+@             IN        NS        ns1.group3.ingi. 
+@             IN        NS        ns2.group3.ingi. 
+@             IN        TXT       "zone group3" 
+ns1           IN        AAAA      fd00:200:3:100::53 
+website       IN        AAAA      fd00:200:3:100::80 
+ns2           IN        AAAA      fd00:200:3:101::53 
+website       IN        AAAA      fd00:200:3:101::80 
+ns1           IN        AAAA      fd00:300:3:100::53 
+website       IN        AAAA      fd00:300:3:100::80 
+ns2           IN        AAAA      fd00:300:3:101::53 
+website       IN        AAAA      fd00:300:3:101::80 
+www.website   IN        CNAME     website

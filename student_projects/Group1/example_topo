@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Create a virtual network using network namespaces and veth pairs
+# to connect them.
+# Assuming $CONFIGDIR == "cfg":
+# * Files in cfg/<Node name> will be overlaid over /etc, i.e. if a file with
+# the same name exists in both directory, the one in cfg/<Node name> will
+# be the one used.
+# * If cfg/<Node name>_$BOOT (defaults to cfg/<Node name>_boot) exists and
+# is executable, it will be executed when the node is created
+# * If cfg/<Node name>_$STARTUP (defaults to cfg/<Node name>_start) exists and
+# is executable, it will be executed when the whole network has started
+#
+
+# You can override any of these settings on a per-topology basis
+# Group number
+GROUPNUMBER=255
+# Node configs  
+CONFIGDIR=example_cfg
+# boot script name
+BOOT="boot"
+# startup script name
+STARTUP="start"
+PREFIXBASE="fd00:${GROUPNUMBER}"
+PREFIXLEN=32
+# You can reuse the above two to generate ip addresses/routes, ...
+# e.g. "${PREFIXBASE}:1234::/$((PREFIXLEN+16))"
+
+# This function describes the network topology that we want to emulate
+function mk_topo {
+    echo "@@ Adding links and nodes"
+    # Build a small network BELNET - BXL - LLN
+    # Nodes are creadted on the fly, and their interface are assigned as
+    # <node name>-eth<count>, where count starts at 0 and is increased by 1
+    # after each new interface
+    # e.g. BXL-eth0 links to LLN-eth0
+    add_link BXL LLN
+    # BXL-eth1 links to BELNET-eth0
+    add_link BXL BELNET
+
+    echo "@@ Adding LANs"
+    # Create a new LAN (subnet), attached to BELNET, with 2 hosts: B1 and B2
+    mk_LAN BELNET B1 B2
+    # Same but with 4 hosts in LLN
+    mk_LAN LLN L1 L2 L3 L4
+
+    echo "@@ Briding the network"
+    # Connect BELNET to its two connectivity providers
+    bridge_node BELNET eth1 as200
+    bridge_node BELNET eth2 as300
+}
+

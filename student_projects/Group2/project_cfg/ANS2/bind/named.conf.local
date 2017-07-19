@@ -1,0 +1,21 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+zone "group2.ingi" {
+    type slave; // ANS2 is the slave in our network
+    masters { fd00:200:2:103::2; fd00:300:2:103::2; }; // ANS1 is the master
+    allow-transfer { ::/0;}; // Allow AXFR (from everyone, as described in the project's guidelines)
+    allow-notify { fd00:200:2:103::2; fd00:300:2:103::2; }; // Allow the master to notify any changes
+};
+
+zone "0.2.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa." {
+    type slave; // ANS2 is the slave in our network
+    masters { fd00:200:2:103::2; fd00:300:2:103::2; }; // ANS1 is the master
+    allow-transfer { ::/0;}; // Allow AXFR (from everyone, as described in the project's guidelines)
+    allow-notify { fd00:200:2:103::2; fd00:300:2:103::2; }; // Allow the master to notify any changes
+};

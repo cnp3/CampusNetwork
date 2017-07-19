@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ip link set dev WEB21-eth0 up
+routing/setup_lan.py WEB21-eth0
+
+/usr/sbin/sshd
+/usr/local/nginx/sbin/nginx -c /etc/nginx/nginx.conf
+
+ulogd -d
+#firewall/ST-WEB1.sh

@@ -1,0 +1,51 @@
+acl campus { // ACL containing all routers and hosts on the campus network
+    fd00:200:2::/48;
+    fd00:300:2::/48;
+    localhost;
+};
+
+options {
+	directory "/var/cache/bind";
+
+	// If there is a firewall between you and nameservers you want
+	// to talk to, you may need to fix the firewall to allow multiple
+	// ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+	// If your ISP provided one or more IP addresses for stable 
+	// nameservers, you probably want to use them as forwarders.  
+	// Uncomment the following block, and insert the addresses replacing 
+	// the all-0's placeholder.
+
+	// forwarders {
+	// 	0.0.0.0;
+	// };
+
+	//========================================================================
+	// If BIND logs error messages about the root key being expired,
+	// you will need to update your keys.  See https://www.isc.org/bind-keys
+	//========================================================================
+	dnssec-validation yes; // Using DNSSEC
+	dnssec-enable yes;
+	recursion yes; // Recursion is of course allowed, since it's a recursive DNS server
+    allow-transfer { none; }; // No zone transfer allowed
+
+	forwarders { // Forward to 
+		fd00::d; // project's root DNS server
+		fd00:200:2:0103::2; // our two authoritative DNS server for group2
+		fd00:200:2:0204::2;
+        };
+    forward only; // Only forwarding, no own zones
+
+	allow-query { // Queries are only allowed from within the campus network
+                campus;
+    };
+
+    allow-query-cache { // Idem
+            campus;
+    };
+
+	auth-nxdomain no;    // conform to RFC1035
+	listen-on-v6 { any; }; // Listening to IPv6
+};
+
+

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Generate a new key
+ssh-keygen -t rsa -N "" -f /etc/ssh_key/monitor
+
+# Add the key to the authorized_keys file
+cat /etc/ssh_key/monitor.pub >> /root/.ssh/authorized_keys

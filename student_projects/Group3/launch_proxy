@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Start haproxy
+haproxy -f /etc/haproxy/haproxy.cfg -D

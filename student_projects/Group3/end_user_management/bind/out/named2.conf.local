@@ -1,0 +1,95 @@
+//
+// Do any local configuration here
+//
+
+//Reverse of loadbalancer fd00:200:3:100::80
+zone 0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.3.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa IN{
+    type master;
+    file "/etc/bind/zones/db.0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.3.0.0.0.0.0.2.0.0.0.d.f.in-addr.arpa";
+};
+
+//Reverse of loadbalancer fd00:300:3:100::80
+zone 0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.3.0.0.0.0.0.3.0.0.0.d.f.ip6.arpa IN{
+    type master;
+    file "/etc/bind/zones/db.0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.3.0.0.0.0.0.3.0.0.0.d.f.in-addr.arpa";
+};
+
+//Reverse of loadbalancer fd00:200:3:101::80
+zone 0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0.3.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa IN{
+    type master;
+    file "/etc/bind/zones/db.0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0.3.0.0.0.0.0.2.0.0.0.d.f.in-addr.arpa";
+};
+
+//Reverse of loadbalancer fd00:300:3:101::80
+zone 0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0.3.0.0.0.0.0.3.0.0.0.d.f.ip6.arpa IN{
+    type master;
+    file "/etc/bind/zones/db.0.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.0.3.0.0.0.0.0.3.0.0.0.d.f.in-addr.arpa";
+};
+
+//Zone group3.ingi : public zone
+zone "group3.ingi" IN {
+    type master;
+    file "/etc/bind/zones/db.group3.ingi";
+};
+
+//Zone router.group3.ingi : zone with all our routers : allow only inside our network
+zone "router.group3.ingi" IN {
+    type master;
+    file "/etc/bind/zones/db.router.group3.ingi";
+    //Only available for users inside the network
+    allow-query {intern_user;};
+    allow-transfer {intern_user;};
+};
+zone "service.group3.ingi" IN {
+    type master;
+    file "/etc/bind/zones/db.service.group3.ingi";
+    //Only available for users inside the network
+    //WARNING : informations about the services available for all users of the network 
+    //Better solution to allow only one kind of user but now it's available for all users to debug
+    allow-query {intern_user;};
+    allow-transfer {intern_user;};
+};
+
+// Reverse infrastructure/router zone fd00:300:3:00xx::
+zone "0.0.3.0.0.0.0.0.3.0.0.0.d.f.ip6.arpa" IN {
+    type master ;
+    file "/etc/bind/zones/db.0.0.3.0.0.0.0.0.3.0.0.0.d.f.in-addr.arpa";
+    //Only available for users inside the network
+    allow-query {intern_user;};
+    allow-transfer {intern_user;};
+};
+
+// Reverse infrastructure/router zone fd00:200:3:00xx::
+zone "0.0.3.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa" IN {
+    type master ;
+    file "/etc/bind/zones/db.0.0.3.0.0.0.0.0.2.0.0.0.d.f.in-addr.arpa";
+    //Only available for users inside the network
+    allow-query {intern_user;};
+    allow-transfer {intern_user;};
+};
+
+// Reverse service zone fd00:200:3:01xx::
+zone "1.0.3.0.0.0.0.0.3.0.0.0.d.f.ip6.arpa" IN {
+    type master ;
+    file "/etc/bind/zones/db.1.0.3.0.0.0.0.0.3.0.0.0.d.f.in-addr.arpa";
+    //Only available for users inside the network
+    //Same remark as the service zone
+    allow-query {intern_user;};
+    allow-transfer {intern_user;};
+};
+
+// Reverse service zone fd00:300:3:00xx::
+zone "1.0.3.0.0.0.0.0.2.0.0.0.d.f.ip6.arpa" IN {
+    type master ;
+    file "/etc/bind/zones/db.1.0.3.0.0.0.0.0.2.0.0.0.d.f.in-addr.arpa";
+    //Only available for users inside the network
+    //Same remark as the service zone
+    allow-query {intern_user;};
+    allow-transfer {intern_user;};
+};
+
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones/zones.rfc1918";
+

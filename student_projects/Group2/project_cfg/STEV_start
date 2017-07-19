@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Towards PYTH
+ip link set dev STEV-eth0 up
+#ip address add dev STEV-eth0 fd00:2:cd::d/64
+
+# Towards CARN
+ip link set dev STEV-eth1 up
+#ip address add dev STEV-eth1 fd00:2:de::d/64
+
+# LAN + VLAN
+routing/setup_lan.py STEV-lan0
+
+# QoS
+./qos/qos.sh PYTH STEV-eth0 CRAN STEV-eth1
+
+bird6 -s /tmp/STEV.ctl
+
+# dhcp relay
+dhcrelay -q -6 -l STEV-lan0.1 -l STEV-lan0.2 -u fd00:200:2:103::1%STEV-lan0 -u fd00:200:2:204::1%STEV-eth0 -u fd00:200:2:204::1%STEV-eth1 --no-pid
+
+#Firewall
+firewall/STEV.sh
+ulogd -d
+
+/usr/sbin/sshd
+
+#radvd
+radvd -n -C /etc/radvd.conf
+

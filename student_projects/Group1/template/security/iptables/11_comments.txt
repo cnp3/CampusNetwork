@@ -1,0 +1,5 @@
+
+# Below we open for 'other devices' the access to different services. See the report
+# for more exlainations about rights attributed for the different user types.
+# We allow : TCP 53,2100,5001,5060,5061 + range 2200:2299
+# UDP : 53,5060,5061 + range 16384:32767

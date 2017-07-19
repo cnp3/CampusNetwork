@@ -1,0 +1,8 @@
+$TTL 300
+[[reverse_name_300]]	IN	SOA	[[name]].group1.ingi. root.[[name]].group1.ingi.(
+			      3		; Serial
+			   1200		; Refresh: We put 1200 (20mins) by following RFC1912 and because our zones could regularly change because of link failures robustness.
+			    300		; Retry: This is a fraction of the Refresh value (RFC1912)
+			2419200		; Expire: With respect to RFC1912
+			   300 )	; Negative Cache TTL: value with respect to RFC : Not greater than the positive TTL of our zones
+$INCLUDE /etc/bind/reverse/db.ingi.300.reverse	; Loading the public records (visible by everyone). We do not load the hidden records as this file will be served to everyone outside our network.

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ip link set dev CA3-eth0 up
+routing/setup_lan.py CA3-eth0
+
+(sleep 5 ; dhclient -6 CA3-eth0.3) &
+ulogd -d

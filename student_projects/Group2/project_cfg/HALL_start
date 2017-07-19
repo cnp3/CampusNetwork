@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Towards SH1C
+ip link set dev HALL-eth0 up
+#ip address add dev HALL-eth0 fd00:2:ab::b/64
+
+# Towards PYTH
+ip link set dev HALL-eth1 up
+ip address add dev HALL-eth1 fd00:2:bc::b/64 preferred_lft 0
+
+# LAN
+routing/setup_lan.py HALL-lan0
+
+# Towards POP
+ip address add dev pop300 fd00:300::2/48
+
+# Dual-homing rules
+ip -6 rule add from fd00:300:2::/48 to fd00:200:2::/48 pref 200 table main # Route normally internal connections
+ip -6 rule add from fd00:300:2::/48 to fd00:300:2::/48 pref 200 table main # Idem
+
+ip -6 rule add from fd00:300:2::/48 table dualhoming # Traffic from 300 prefix goes uses the dualhoming table
+ip -6 rule add from fd00:300::2 table dualhoming
+ip -6 route add ::/0 via fd00:300::b table dualhoming dev pop300 # Everything from dualhoming goes to POP300
+
+# QoS
+./qos/qos.sh SH1C HALL-eth0 PYTH HALL-eth1
+
+bird6 -s /tmp/HALL.ctl
+
+# DHCP relay
+dhcrelay -q -6 -l HALL-lan0.4 -l HALL-lan0.3 -u fd00:200:2:103::1%HALL-eth1 -u fd00:200:2:103::1%HALL-eth0 -u fd00:200:2:204::1%HALL-eth1 -u fd00:200:2:204::1%HALL-eth0
+
+#Firewall
+firewall/HALL.sh
+ulogd -d
+
+/usr/sbin/sshd
+
+#radvd
+radvd -n -C /etc/radvd.conf
+

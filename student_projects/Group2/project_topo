@@ -1,0 +1,43 @@
+#!/bin/bash
+
+
+# You can override any of these settings on a per-topology basis
+# Group number
+GROUPNUMBER=2
+# Node configs  
+CONFIGDIR=project_cfg
+PREFIXA="fd00:200:${GROUPNUMBER}::/48"
+PREFIXB="fd00:200:${GROUPNUMBER}::/48"
+
+# This function describes the network topology that we want to emulate
+function mk_topo {
+    echo "@@ Generating configuration files"
+    routing/gen_birdconfs.py
+    routing/gen_dhcpconfs.py
+
+    echo "@@ Adding links and nodes"
+    add_link MICH SH1C # mich-eth0 sh1c-eth0
+    add_link SH1C HALL  # sh1c-eth1 hall-eth0 
+    add_link HALL PYTH  # hall-eth1 pyth-eth0
+    add_link STEV PYTH  # stev-eth0 pyth-eth1
+    add_link STEV CARN  # stev-eth1 carn-eth0
+    add_link CARN MICH  # carn-eth1 mich-eth1
+    add_link PYTH CARN  # pyth-eth2 carn-eth2
+
+    echo "@@ Adding LANs"
+    mk_LAN MICH MON2 MI2 MI4
+    mk_LAN SH1C MON1 SH3 SH4
+    mk_LAN HALL HA3 HA4
+    mk_LAN PYTH PY2 PY3
+    mk_LAN STEV DHCP1 ANS1 RNS1 LB1 WEB11 WEB12 ST1 ST2
+    mk_LAN CARN DHCP2 ANS2 RNS2 LB2 WEB21 WEB22 CA1 CA3
+
+
+    echo "@@ Bridging the network"
+    bridge_node HALL eth1 pop300
+    bridge_node PYTH eth2 pop200
+    # We likely want to have redundant connections to our 2 providers
+    # bridge_node HALL eth1 HALL-belnetb
+    # bridge_node PYTH eth2 HALL-belneta
+}
+

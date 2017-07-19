@@ -1,0 +1,38 @@
+
+acl intern_user {
+	fd00:200:3::/48;
+	fd00:300:3::/48;
+};
+
+options {
+       directory "/var/cache/bind/ns1";
+       pid-file  "/var/run/named_ns1.pid";
+
+       // Exchange port between DNS servers
+       //query-source address * port *;
+
+       // Transmit requests to fd00::d
+       forward first;
+       forwarders { fd00::d; };
+
+       auth-nxdomain no;    # conform to RFC1035
+
+       // Turn on IPv6 
+	listen-on-v6 { any; };
+
+       // Transfer only allow to the user of the project 
+       allow-transfer { fd00::; };
+
+       // Accept requests for internal network only
+       allow-query { any; };
+
+       // Allow recursive queries from intern users to do the recursion job
+       allow-recursion { intern_user; };
+
+	// Allow cache queries answear only for user inside our network
+	// Thanks to that other users can't have informations about our cache
+       allow-query-cache { intern_user;};
+
+       // Do not make public version of BIND
+       version none;
+};

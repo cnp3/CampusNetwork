@@ -1,0 +1,19 @@
+==== CHANGELOG ====
+
+* Instead of having all ours servers scattered accross 4-5 datacenters, we decided to have two main datacenters in mirror, each of them containing instances of all the services. We also renamed our servers to indicate their service (ST1 -> DHCP1, CA1 -> WEB11, etc).
+* Fixing DHCP which was bugging on some LANs
+* Added PTR records (forgot to implement them for the first submission)
+* Added monitoring (hadn't time to do it before the first submission)
+* Made a new script to generate properly SSH keys (based on suggestions from the peer reviews)
+* Added a descriptive README
+* Firewall
+- Set the last routers to DROP as default policies
+- Add a policy to filter spoofed ip addresses from the outside
+- Add forgotten rules for OSPF
+- Add rules for "phones"
+- Add a test script (firewall/run_tests.sh)
+- Fix wrong number port of DNS for students
+
+
+
+

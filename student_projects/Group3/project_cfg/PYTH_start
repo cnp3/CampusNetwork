@@ -1,0 +1,53 @@
+#!/bin/bash 
+
+# This file has been generated automatically, see router_config_creation.py for details. 
+
+ip link set dev belnetb up 
+ip address add dev belnetb fd00:200::3/48  
+
+ip link set dev PYTH-eth1 up 
+ip address add dev PYTH-eth1 fd00:200:3:3::2/64 
+ip address add dev PYTH-eth1 fd00:300:3:3::2/64 
+ip link set dev PYTH-eth2 up 
+ip address add dev PYTH-eth2 fd00:200:3:2::2/64 
+ip address add dev PYTH-eth2 fd00:300:3:2::2/64 
+ip link set dev PYTH-eth0 up 
+ip address add dev PYTH-eth0 fd00:200:3:1::2/64 
+ip address add dev PYTH-eth0 fd00:300:3:1::2/64 
+
+ip link set dev PYTH-lan0 up 
+ip address add dev PYTH-lan0 fd00:200:3:101::/64 
+ip address add dev PYTH-lan0 fd00:300:3:101::/64 
+ip link set dev PYTH-lan2 up 
+ip address add dev PYTH-lan2 fd00:200:3:0ff::/64 
+ip address add dev PYTH-lan2 fd00:300:3:0ff::/64 
+
+ip link set dev PYTH-lan1 up 
+ip link add link PYTH-lan1 name PYTH-lan1.201 type vlan id 0x201 
+ip link set dev PYTH-lan1.201 up 
+ip address add dev PYTH-lan1.201 fd00:200:3:201::/64 
+ip address add dev PYTH-lan1.201 fd00:300:3:201::/64 
+ip link add link PYTH-lan1 name PYTH-lan1.301 type vlan id 0x301 
+ip link set dev PYTH-lan1.301 up 
+ip address add dev PYTH-lan1.301 fd00:200:3:301::/64 
+ip address add dev PYTH-lan1.301 fd00:300:3:301::/64 
+ip link add link PYTH-lan1 name PYTH-lan1.501 type vlan id 0x501 
+ip link set dev PYTH-lan1.501 up 
+ip address add dev PYTH-lan1.501 fd00:200:3:501::/64 
+ip address add dev PYTH-lan1.501 fd00:300:3:501::/64 
+ip link add link PYTH-lan1 name PYTH-lan1.601 type vlan id 0x601 
+ip link set dev PYTH-lan1.601 up 
+ip address add dev PYTH-lan1.601 fd00:200:3:601::/64 
+ip address add dev PYTH-lan1.601 fd00:300:3:601::/64 
+
+
+ip -6 rule add from fd00:300:3::/48 to fd00:200:3::/48 pref 1000 table main
+ip -6 rule add from fd00:300:3::/48 to fd00:300:3::/48 pref 1000 table main
+ip -6 route add ::/0 via fd00:200:3:1::1 dev PYTH-eth0 metric 1 table 10
+ip -6 rule add from fd00:300:3::/48 pref 2000 table 10
+/usr/sbin/sshd
+/etc/routing/backup_link_switcher.sh &
+
+dhcrelay -q -pf /var/run/PYTH_dhcrel -6  -l PYTH-lan1.201 -l PYTH-lan1.301 -l PYTH-lan1.501 -l PYTH-lan1.601 -u fd00:200:3:100::547%PYTH-lan0 -u fd00:200:3:101::547%PYTH-lan0 -u fd00:300:3:100::547%PYTH-lan0 -u fd00:300:3:101::547%PYTH-lan0 -u fd00:200:3:100::547%PYTH-eth1 -u fd00:200:3:101::547%PYTH-eth1 -u fd00:300:3:100::547%PYTH-eth1 -u fd00:300:3:101::547%PYTH-eth1 -u fd00:200:3:100::547%PYTH-eth2 -u fd00:200:3:101::547%PYTH-eth2 -u fd00:300:3:100::547%PYTH-eth2 -u fd00:300:3:101::547%PYTH-eth2 -u fd00:200:3:100::547%PYTH-eth0 -u fd00:200:3:101::547%PYTH-eth0 -u fd00:300:3:100::547%PYTH-eth0 -u fd00:300:3:101::547%PYTH-eth0
+bird6 -s /tmp/PYTH.ctl -P /tmp/PYTH_bird.pid 
+radvd -p /var/run/radvd/PYTH_radvd.pid -C /etc/radvd/PYTH.conf -m logfile -l /var/log/radvd/PYTH.log

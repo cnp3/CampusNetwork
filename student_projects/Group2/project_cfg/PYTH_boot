@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "PYTH has booted"
+
+# Reload sysctl's, e.g. to enable IP forwarding. See cfg/BELNET/sysctl.conf
+# (Do not forget that programs run from this script or using
+# ip netns exec BELNET ... first check into cfg/BELNET before loading a file
+# from /etc
+# As we call this before adding any interfaces, we know that the settings will
+# be applied automatically to every new interface
+sysctl -p
