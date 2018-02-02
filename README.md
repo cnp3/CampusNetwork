@@ -1,4 +1,4 @@
-# LINGI2142-setup
+# lingi2142
 
 This repository contains:
 
@@ -60,22 +60,22 @@ virtual network as well as loads and apply its configuration files.
            virtual interface named `$name` of the network node `$node`.
 
   When executed, the script creates the network according to the `mk_topo`
-    function. For each network node, files and directory present in 
-    `$CONFIGDIR/<node name>` (i.e. cfg) will be mounted on /etc (i.e., providing
-    an overlay only visible to that node). Two scripts are then executed on
-    each node, if available and executable:
+    function. For each network node, the directory named
+    `$CONFIGDIR/<node name>` (i.e. `cfg/<node name>`) will be mounted on /etc
+    (i.e., providing an overlay only visible to that node). 
+    Two scripts are then executed on each node, if available and executable:
       * `$CONFIGDIR/<node name>_$BOOT` is executed right after the creation of
            the node, and before the creation of its links.
       * `$CONFIGDIR/<node name>_$STARTUP` is executed on every node once the
            whole network has been created (i.e. links, LANs, ...), thus once 
            the `mk_topo` function *returns* (i.e. do not make blocking calls
            in it ...).
-  * [./connect_to.sh](connect_to.sh) takes one argument, a node's name
-      as defined in the `mk_topo` function (i.e., `BXL` for the
-      `example_topo`), and opens a shell in its environment.
+  * [./connect_to.sh](connect_to.sh) takes two arguments, a configuration
+      folder, and a node's name as defined in the `mk_topo` function (i.e., 
+      `BXL` for the `example_topo`), and opens a shell in its environment.
   * [./cleanup.sh](cleanup.sh) will shutdown the network and attempt to clean
       all associated resources such as links, temp files, net NS, processes.
-      You should extend this script to account for you own tempfiles.
+      *You should extend this script to account for you own tempfiles.*
 
 Two topologies are pre-defined to be started with the create_topo script.
   1. [example_topo](example_topo) is a sample topology showing how to start a
@@ -83,6 +83,11 @@ Two topologies are pre-defined to be started with the create_topo script.
      the next section for a detailed description.
   2. [project_topo](project_topo) defines the base topology to use (and change
      if needed) for the course project itself).
+
+By default, the `create_network.sh` script imports a few files from `/etc` in
+the different nodes order to help you. If you need additional files,
+edit the base array and append their names in `ETC_IMPORT` at the top of that
+script.
 
 ## Example topology
 
@@ -161,7 +166,7 @@ to the closest router.
 
 We emulate networks on a single machine by leveraging Linux network
 namespace, to which we interface using the `ip netns` command family (from
-`iproute2`, see `main ip-netns`).
+`iproute2`, see `man ip-netns`).
 
 Conceptually, a net NS is a new instance of the kernel networking stack.
 This enables to have multiple routing tables, set of interfaces, isolated 

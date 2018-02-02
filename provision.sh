@@ -15,4 +15,4 @@ service bird6 stop
 
 (cd /sbin && ln -s /usr/lib/quagga/* .)
 
-su vagrant -c 'cd && git clone https://github.com/oliviertilmans/LINGI2142-setup.git'
+su vagrant -c 'cd && git clone https://github.com/UCL-INGI/lingi2142.git'

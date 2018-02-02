@@ -8,7 +8,12 @@ if [[ "$UID" != "0" ]]; then
 fi
 
 if [[ "$#" -lt "1" ]] ; then
-    echo "This script takes the node name as argument (case sensitive)"
+    echo "This script takes 2 parameters: (i) the config directory and (ii) the node name (case sensitive)"
     exit 1
 fi
-ip netns exec "$1" bash
+
+CONFIGDIR="$1"
+BDIR=$(cd $(dirname $0); pwd -P)
+source "${BDIR}/_node_utils.sh"
+
+node_exec_command "$2" bash

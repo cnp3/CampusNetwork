@@ -1,12 +1,9 @@
 #!/bin/bash
 
-## See the bottom for the bootstrap
+# List here all files from /etc that should be copied
+ETC_IMPORT=(hosts passwd group manpath.config services)
 
-# Get a node's config directory
-# $1: node name
-function node_cfg {
-    echo "${BDIR}/${CONFIGDIR}/$1"
-}
+## See the bottom for the bootstrap
 
 # Execute a script from the node's config dir
 # $1: node name
@@ -17,7 +14,7 @@ function node_exec {
     local SPATH="${cfg}_$2"
     if [ -x "$SPATH" ]; then
         info "Executing $2 for node $1"
-        ip netns exec "$1" "$SPATH" &
+        node_exec_command "$1" "$SPATH" &
     else
         warn "No executable '$2' found for node $1"
     fi
@@ -32,23 +29,15 @@ function mk_node {
     LANCOUNT[$1]=0
     # Create the namespace
     ip netns add "$1"
+    mkdir -p "$(node_rundir $1)"
     # Get the node's config dir path
     local CDIR
     CDIR=$(node_cfg "$1")
     # Make the config dir if non-existent
     mkdir -p "$CDIR"
-    # symlink it in /etc/netns/<ns>
-    (cd "/etc/netns" && ln -s "$CDIR" "$1")
-    # Ensures we have entries for all files that need to be bound in the net
-    # NS in /etc
-    for f in "$CDIR"/*; do
-        local name
-        name=$(basename "$f")
-        if [ -d "$f" ]; then
-            mkdir -p "/etc/$name"
-        else
-            touch "/etc/$name"
-        fi
+    [ ! -f "${CDIR}/hostname" ] && echo "$1" > "${CDIR}/hostname"
+    for file in "${ETC_IMPORT[@]}"; do
+        [ ! -f "${CDIR}/${file}" ] && cp "/etc/${file}" "${CDIR}/${file}"
     done
     # Enable the loopback in the net NS, quite a few programs require it
     ip netns exec "$1" ip link set dev lo up
@@ -237,8 +226,8 @@ declare -A PORTCOUNT
 # node -> next free bridge number
 declare -A LANCOUNT
 
-# Ensure /etc/netns exists
-mkdir -p /etc/netns
+# Load node commands
+source "${BDIR}/_node_utils.sh"
 
 # Instantiate the topology
 mk_topo

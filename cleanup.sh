@@ -36,10 +36,5 @@ for ns in $(ip netns list) ; do
     ip netns del "$ns"
 done
 
-    # Unlink the config symlinks
-for f in /etc/netns/* ; do
-    unlink "$f"
-done
-
 # Destroy bird/zebra temp files
 rm -f /tmp/*.{api,ctl}
