@@ -36,6 +36,7 @@ run an emulated network.
 
 The main directory of this repository contains the set of scripts to start a
 virtual network as well as loads and apply its configuration files.
+You _should_ only run such a network within the VM.
 
 ## Description
 
@@ -72,7 +73,9 @@ virtual network as well as loads and apply its configuration files.
            in it ...).
   * [./connect_to.sh](connect_to.sh) takes two arguments, a configuration
       folder, and a node's name as defined in the `mk_topo` function (i.e., 
-      `BXL` for the `example_topo`), and opens a shell in its environment.
+      `BXL` for the `example_topo`), and opens a shell in its environment. This
+      is useful to access a node through an out of band channel (i.e., it will
+      work even if the network itself is not working), thus for debug purposes.
   * [./cleanup.sh](cleanup.sh) will shutdown the network and attempt to clean
       all associated resources such as links, temp files, net NS, processes.
       *You should extend this script to account for you own tempfiles.*
@@ -151,7 +154,7 @@ to the closest router.
      address of the node `L1`.
      ```bash
      sudo ./create_network.sh example_topo
-     sudo ./connect_to.sh B1
+     sudo ./connect_to.sh example_cfg B1
      iperf -V -c fd00:255:11::1
      ```
   2. Use the `connect_to.sh` script to get a shell in different nodes.
