@@ -1,13 +1,17 @@
 #!/bin/bash
 
+# Main interface on the host machine
+INTERFACE="enp6s4f1"
 # Group numbers
-ALL_GROUPS=(1 2 3 5 6 7 9 10)
+ALL_GROUPS=(1 2 3 5 6 7 9)
 # The qemu executable on *this* machine
 QEMU=qemu-system-x86_64
 # Verbosity
 LOG_LEVEL=0  # Set to 1 to restrict to info+, 2 to warn, 3 to disable
 # Vagrant box version on Alas
-BOX_VERSION="8.7.0"
+BOX_VERSION="8.10.0"
+# disk image in the box
+VMDK_IMG="jessie.vmdk"
 # The master VM HD name
 BASE_DISK="disk.qcow2"
 # Guest VM max RAM
@@ -88,12 +92,12 @@ function prepare_vm {
 function mk_master_hd {
     set -e
     debg "Retrieving VM box image"
-    wget "https://atlas.hashicorp.com/debian/boxes/jessie64/versions/${BOX_VERSION}/providers/virtualbox.box"
+    wget "https://app.vagrantup.com/debian/boxes/jessie64/versions/${BOX_VERSION}/providers/virtualbox.box"
     debg "Decompressing"
     mv virtualbox.box virtualbox.gz
     gunzip -d virtualbox.gz
     tar -xvf virtualbox
-    rm -r include Vagrantfile box.ovf virtualbox 
+    rm -r Vagrantfile box.ovf virtualbox 
     convert_img
     set +e
 }
@@ -101,7 +105,7 @@ function mk_master_hd {
 # Convert a VM HD image to qcow2
 function convert_img {
     debg "Converting VM disk image"
-    qemu-img convert -O qcow2 box-disk1.vmdk "$BASE_DISK"
+    qemu-img convert -O qcow2 "$VMDK_IMG" "$BASE_DISK"
 }
 
 # Prepare a given directory to be used as chroot
@@ -537,12 +541,12 @@ EOD
 
 # Print the current default IPv4 address of this node
 function get_v4 {
-    ip route get 8.8.8.8 | head -1 | cut -d' ' -f8
+    ip route get 8.8.8.8 | head -1 | cut -d' ' -f7
 }
 
 # Print the current default IPv6 address of this node
 function get_v6 {
-    ip route get 2001:4860:4860::8888 | head -1 | cut -d' ' -f10
+    ip route get 2001:4860:4860::8888 | head -1 | cut -d' ' -f9
 }
 
 ###############################################################################
@@ -552,7 +556,7 @@ function get_v6 {
 # Create a network bridge
 # $1: name
 # $2: address
-# $3: FORWARD chain from eth0 ctstate extra
+# $3: FORWARD chain from $INTERFACE ctstate extra
 # $4: allow traffic from prefix
 function mk_bridge {
     if ip link sh dev "$1"; then 
@@ -581,8 +585,8 @@ function mk_bridge {
     # Drop the hazardous ones
     ip6tables -A INPUT -i "$1" -p icmpv6 -j DROP
     # NAT to the touside v6-native connection
-    ip6tables -A FORWARD -i eth0 -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
-    ip6tables -A FORWARD -i "$1" -o eth0 -j ACCEPT
+    ip6tables -A FORWARD -i "$INTERFACE" -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
+    ip6tables -A FORWARD -i "$1" -o "$INTERFACE" -j ACCEPT
     # NAT to the NAT64 interface
     ip6tables -A FORWARD -i "$TAYGADEV" -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
     ip6tables -A FORWARD -i "$1" -o "$TAYGADEV" -j ACCEPT
@@ -598,7 +602,7 @@ function mk_bridge {
 # Delete the network bridge
 # $1: name
 # $2: address
-# $3: FORWARD chain from eth0 ctstate extra
+# $3: FORWARD chain from "$INTERFACE" ctstate extra
 function del_bridge {
     ip link del dev "$1"
     ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type destination-unreachable -j ACCEPT
@@ -610,8 +614,8 @@ function del_bridge {
     ip6tables -D INPUT -i "$1" -p icmpv6 --icmpv6-type echo-reply -j ACCEPT
     ip6tables -D INPUT -i "$1" -p icmpv6 -j DROP
 
-    ip6tables -D FORWARD -i eth0 -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
-    ip6tables -D FORWARD -i "$1" -o eth0 -j ACCEPT
+    ip6tables -D FORWARD -i "$INTERFACE" -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
+    ip6tables -D FORWARD -i "$1" -o "$INTERFACE" -j ACCEPT
     ip6tables -D FORWARD -i "$TAYGADEV" -o "$1" -m conntrack --ctstate "RELATED,ESTABLISHED$3" -j ACCEPT
     ip6tables -D FORWARD -i "$1" -o "$TAYGADEV" -j ACCEPT
     ip6tables -D FORWARD -o "$1" -s "$4" -j ACCEPT
@@ -672,7 +676,7 @@ function start_network {
         mk_bridge "$SSHBR" "${SSHBASE}::/64" ",DNAT" "${SSHBASE}::/64"
     fi
 
-    ip6tables -t nat -A POSTROUTING -o eth0 -s "${NETBASE}::/${BASELEN}" -j SNAT --to-source "$(get_v6)"
+    ip6tables -t nat -A POSTROUTING -o "$INTERFACE" -s "${NETBASE}::/${BASELEN}" -j SNAT --to-source "$(get_v6)"
     ip6tables -P FORWARD DROP
 
     for pop in "${ASN_KEYS[@]}"; do
@@ -717,7 +721,7 @@ function kill_network {
     for pop in "${ASN_KEYS[@]}"; do
         kill_pop "$pop"
     done
-    ip6tables -t nat -D POSTROUTING -o eth0 -s "${NETBASE}::/${BASELEN}" -j SNAT --to-source "$(get_v6)"
+    ip6tables -t nat -D POSTROUTING -o "$INTERFACE" -s "${NETBASE}::/${BASELEN}" -j SNAT --to-source "$(get_v6)"
 
     # Delete the management bridge
     info "Tearing down SSH management bridge"
@@ -747,15 +751,15 @@ function start_tayga {
     ip address add dev "$TAYGADEV" "${NAT64PREFIX}::1"
 
     debg "NATing interface $TAYGADEV"
-    iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source "$(get_v4)"
-    iptables -A FORWARD -i eth0 -o "$TAYGADEV" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    iptables -A FORWARD -i "$TAYGADEV" -o eth0 -j ACCEPT
+    iptables -t nat -A POSTROUTING -o "$INTERFACE" -j SNAT --to-source "$(get_v4)"
+    iptables -A FORWARD -i "$INTERFACE" -o "$TAYGADEV" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A FORWARD -i "$TAYGADEV" -o "$INTERFACE" -j ACCEPT
 
     sysctl -w net.ipv4.ip_forward=1
-    sysctl -w net.ipv6.conf.eth0.forwarding=1
+    sysctl -w "net.ipv6.conf.${INTERFACE}.forwarding=1"
     # If forwarding, then by default RFC2462 transforms this node into a router,
     # thus causes it ignore RAs. As we are masquerading, bypass this.
-    sysctl -w net.ipv6.conf.eth0.accept_ra=2
+    sysctl -w "net.ipv6.conf.${INTERFACE}.accept_ra=2"
     sysctl -w "net.ipv6.conf.${TAYGADEV}.forwarding=1"
     tayga -c "$TAYGACONF" -p tayga.pid
     info "Started tayga"
@@ -768,8 +772,8 @@ function _default_sysctl {
 }
 
 function stop_tayga {
-    _default_sysctl net.ipv6.conf.eth0.forwarding
-    _default_sysctl net.ipv6.conf.eth0.accept_ra
+    _default_sysctl "net.ipv6.conf.${INTERFACE}.forwarding"
+    _default_sysctl "net.ipv6.conf.${INTERFACE}.accept_ra"
     sysctl -w "net.ipv6.conf.${TAYGADEV}.forwarding=0"
 
     # Tayga creates its pid file *after* chrooting to its data dir
@@ -777,9 +781,9 @@ function stop_tayga {
     rm -f "$TAYGACHROOT/tayga.pid"
     debg "Stopped tayga"
 
-    iptables -t nat -D POSTROUTING -o eth0 -j SNAT --to-source "$(get_v4)"
-    iptables -D FORWARD -i eth0 -o "$TAYGADEV" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-    iptables -D FORWARD -i "$TAYGADEV" -o eth0 -j ACCEPT
+    iptables -t nat -D POSTROUTING -o "$INTERFACE" -j SNAT --to-source "$(get_v4)"
+    iptables -D FORWARD -i "$INTERFACE" -o "$TAYGADEV" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -D FORWARD -i "$TAYGADEV" -o "$INTERFACE" -j ACCEPT
     debg "Removed NATing rules for $TAYGADEV"
 
     ip link set dev "$TAYGADEV" down
@@ -890,7 +894,7 @@ function setup_ssh_management_port {
         debg "Forwarding host TCP port ${port} to group $1 on $sshtarget"
         # Infer destination IPv6 address from destination port
         # We also rewrite the source IP address (cfr. start_network)
-        ip6tables -t nat -A PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
+        ip6tables -t nat -A PREROUTING -i "$INTERFACE" -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
 
         ebtables -A INPUT -i "$intf" -p ip6 --ip6-source "$sshtarget" -j ACCEPT
         ebtables -A INPUT -i "$intf" -p ip6 -j DROP
@@ -912,7 +916,7 @@ function del_ssh_management_port {
     ip tuntap del dev "$intf" mode tap
     guest_ssh_address "$1"
     local sshtarget="$__ret"
-    ip6tables -t nat -D PREROUTING -i eth0 -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
+    ip6tables -t nat -D PREROUTING -i "$INTERFACE" -p tcp --dport "$port" -j DNAT --to-destination "[${sshtarget}]:22"
 
     ebtables -A INPUT -i "$intf" -p ip6 --ip6-source "$sshtarget" -j ACCEPT
     ebtables -A INPUT -i "$intf" -p ip6 -j DROP
@@ -1107,15 +1111,22 @@ function conn_vagra {
 }
 
 function fetch_deps {
-    apt-get -y --q --force-yes update
-    apt-get -y --q --force-yes install socat tayga qemu bird6 bind9\
-                                       qemu-system libguestfs-tools
-    update-rc.d bind9 disable
-    service bind9 stop
-    update-rc.d bird6 disable
-    service bird6 stop
-    update-rc.d bird disable
-    service bird stop
+    # Presume that if we have yum we're on CentOS (7)
+    if ! type yum > /dev/null; then
+        yes | yum --enablerepo=extras install epel-release
+        yes | yum install git socat tayga bird6 bind qemu libguestfs-tools
+        systemctl restart libvirt.service
+    else
+        apt-get -y --q --force-yes update
+        apt-get -y --q --force-yes install socat tayga qemu bird6 bind9\
+                                           qemu-system libguestfs-tools
+        update-rc.d bind9 disable
+        service bind9 stop
+        update-rc.d bird6 disable
+        service bird6 stop
+        update-rc.d bird disable
+        service bird stop
+    fi
 }
 
 function asn_cli {
