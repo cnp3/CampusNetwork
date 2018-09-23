@@ -689,6 +689,7 @@ function start_network {
     ebtables -j ACCEPT -p ip6 --ip6-protocol ipv6-icmp --ip6-icmp-type neighbor-advertisement -I OUTPUT
 
     start_bgp
+    sleep 10
     start_looking_glass
 }
 

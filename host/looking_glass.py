@@ -16,6 +16,9 @@ if len(sys.argv) < 3:
 PORT = 80
 ADDRESS = sys.argv[1]
 FILE = sys.argv[2]
+sys.stderr.write("Listening Address " + ADDRESS + "\n")
+sys.stderr.write("Listening Port " + str(PORT) + "\n")
+sys.stderr.write("HTML FILE location " + str(FILE) + "\n")
 
 
 class LookingGlassServer(SocketServer.TCPServer):
@@ -41,7 +44,6 @@ class req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
         finally:
             if f:
                 f.close()
-
 
 
 httpd = LookingGlassServer((ADDRESS, PORT), req_handler)
