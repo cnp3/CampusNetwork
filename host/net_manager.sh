@@ -108,6 +108,7 @@ function mk_master_hd {
 function convert_img {
     debg "Converting VM disk image"
     qemu-img convert -O qcow2 "$VMDK_IMG" "$BASE_DISK"
+    chown qemu:qemu "$BASE_DISK"
 }
 
 # Prepare a given directory to be used as chroot
@@ -244,6 +245,7 @@ function provision_group {
     local hda
     hda=$(group_hda "$1")
     qemu-img create -o "backing_file=${BASE_DISK},backing_fmt=qcow2" -f qcow2 "$hda"
+    chown qemu:qemu "$hda"
 
     local mountpoint=loop
     mount_qcow "$hda" "$mountpoint"
