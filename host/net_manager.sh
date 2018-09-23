@@ -64,6 +64,8 @@ TAYGADEV="nat64"
 TAYGACHROOT="/tmp/tayga"
 # Mac address base for all VM interfaces
 MACBASE="be:ef:de:ad"
+# Max retries when waiting for ssh access to VMs
+MAX_TRIES=90
 
 ###############################################################################
 ## Provision the VMs
@@ -953,6 +955,13 @@ function start_all_vms {
 function set_hostnames {
     for g in "${ALL_GROUPS[@]}"; do
         local hname="group$g"
+        debg "Testing VM connection with nc \"${SSHBASE}::$g\" 22"
+        for i in $(seq 1 "$MAX_TRIES"); do
+            if echo "" | nc "${SSHBASE}::$g" 22; then
+                break
+            fi
+            sleep 1
+	done
         debg "Setting VM hostname for $hname"
         ssh -6 -b "${SSHBASE}::" -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" hostnamectl set-hostname "$hname"
     done
