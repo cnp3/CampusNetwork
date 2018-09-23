@@ -569,6 +569,7 @@ function mk_bridge {
     ip link set dev "$1" up
 
     echo -n 0 > "/sys/class/net/${1}/bridge/multicast_snooping"
+    sysctl -w "net.ipv6.conf.all.forwarding=1"
     sysctl -w "net.ipv6.conf.${1}.disable_ipv6=0"
     sysctl -w "net.ipv6.conf.${1}.forwarding=1"
     sysctl -w "net.ipv6.conf.${1}.accept_ra=0"
