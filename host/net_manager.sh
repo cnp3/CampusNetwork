@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Main interface on the host machine
-INTERFACE="enp6s4f1"
+INTERFACE="enp6s4f0"
 # Group numbers
-ALL_GROUPS=(1 2 3 5 6 7 9)
+ALL_GROUPS=(1 2 3 4 5 6 7 8 9 10 42)
 # The qemu executable on *this* machine
 QEMU=qemu-system-x86_64
 # Verbosity
@@ -1118,7 +1118,7 @@ function connect_to {
 function conn_vagra {
     tcp_fw_port "$1"
     set -x 
-    ssh -6 -o "IdentityFile=group${1}" -p "$__ret" "vagrant@nostromo.info.ucl.ac.be"
+    ssh -6 -o "IdentityFile=group${1}" -p "$__ret" "vagrant@lingi2142tp.info.ucl.ac.be"
     set +x
 }
 
