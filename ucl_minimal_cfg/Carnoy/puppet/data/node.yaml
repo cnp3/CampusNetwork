@@ -1,0 +1,9 @@
+---
+name: Carnoy
+bird6::routing_id: 42.0.0.1 # Should be changed for your group (for instance 42 -> your group number)
+bird6::ospfv3:
+  hello_itfs:  # Activate OSPFv3 only on these interfaces
+    - Carnoy-eth0
+    - Carnoy-eth1
+    - Carnoy-eth2
+  stub_itfs: [] # Passive interfaces (e.g., LANs)

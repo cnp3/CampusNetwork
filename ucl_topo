@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Create a virtual network using network namespaces and veth pairs
+# to connect them.
+# Assuming $CONFIGDIR == "cfg":
+# * Files in cfg/<Node name> will be overlaid over /etc, i.e. if a file with
+# the same name exists in both directory, the one in cfg/<Node name> will
+# be the one used.
+# * If cfg/<Node name>_$BOOT (defaults to cfg/<Node name>_boot) exists and
+# is executable, it will be executed when the node is created
+# * If cfg/<Node name>_$STARTUP (defaults to cfg/<Node name>_start) exists and
+# is executable, it will be executed when the whole network has started
+#
+
+# You can override any of these settings on a per-topology basis
+# Group number
+GROUPNUMBER=42
+# Node configs
+CONFIGDIR=ucl_minimal_cfg
+# boot script name
+BOOT="boot.sh"
+# startup script name
+STARTUP="start.sh"
+PREFIXLEN_as200=48
+PREFIXBASE_as200="fd00:200:${GROUPNUMBER}::/${PREFIXLEN_as200}"
+# You can reuse the above two to generate ip addresses/routes, ...
+# in you boot and startup scripts
+# e.g. "${PREFIXBASE}:1234::/$((PREFIXLEN+16))"
+
+# This function describes the network topology that we want to emulate
+function mk_topo {
+    echo "@@ Adding links and nodes"
+    # Build a minimal UCL network
+    # Nodes are created on the fly, and their interface are assigned as
+    # <node name>-eth<count>, where count starts at 0 and is increased by 1
+    # after each new interface
+    add_link Michotte SH1C      # Michotte-eth0 <-> SH1C-eth0
+    add_link SH1C Halles        # SH1C-eth1     <-> Halles-eth0
+    add_link Michotte Carnoy    # Michotte-eth1 <-> Carnoy-eth0
+    add_link Halles Pythagore   # Halles-eth1   <-> Pythagore-eth0
+    add_link Carnoy Pythagore   # Carnoy-eth1   <-> Pythagore-eth1
+    add_link Carnoy Stevin      # Carnoy-eth2   <-> Stevin-eth0
+    add_link Stevin Pythagore   # Stevin-eth1   <-> Pythagore-eth2
+
+    echo "@@ Adding LANs"
+    # You can add your LANs here
+
+    echo "@@ Bridging the network"
+    # Connect to belneta and belnetb
+    bridge_node Pythagore eth1 belneta
+    bridge_node Halles eth2 belnetb
+}

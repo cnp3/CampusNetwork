@@ -1,0 +1,10 @@
+---
+:backends: yaml
+:yaml:
+  :datadir: "/etc/puppet/data"
+:hierarchy:
+  - "node"
+  - "common"
+:logger: console
+:merge_behavior: native
+:deep_merge_options: {}

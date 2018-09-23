@@ -1,0 +1,8 @@
+---
+name: SH1C
+bird6::routing_id: 42.0.0.5
+bird6::ospfv3:
+  hello_itfs:  # Activate OSPFv3 only on these interfaces
+    - SH1C-eth0
+    - SH1C-eth1
+  stub_itfs: [] # Passive interfaces (e.g., LANs)
