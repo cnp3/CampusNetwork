@@ -476,7 +476,7 @@ options {
 
         auth-nxdomain no;    # conform to RFC1035
         listen-on-v6 { ${BIND_ADDRESS}; };
-        listen-on { 127.0.0.1; }
+        listen-on { 127.0.0.1; };
 
         allow-transfer { ::1; 127.0.0.1; ${BIND_ADDRESS}; };
 
@@ -499,8 +499,6 @@ zone "0.0.d.f.ip6.arpa" {
         type master;
         file "${REVERSE_INGI}";
 };
-
-include "/etc/bind/zones.rfc1918";
 
 zone "localhost" {
         type master;
