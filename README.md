@@ -43,8 +43,8 @@ You _should_ only run such a network within the VM.
   * [./create_network.sh](create_network.sh) will create a virtual network and
     execute startup scripts in every node. It takes one mandatory argument: 
     a bash script defining a `mk_topo` function to describe the topology
-    (i.e., [example_topo](example_topo)). This scripts can also redefine the
-    following environment variables: 
+    (i.e., [example_topo](example_topo) or [ucl_topo](ucl_topo)).
+    This scripts can also redefine the following environment variables: 
       * `CONFIGDIR` to specify which directory contains the configuration files
            for the topology,
       * `BOOT` to specify the prefix of the scripts to run when a network node
@@ -62,8 +62,10 @@ You _should_ only run such a network within the VM.
 
   When executed, the script creates the network according to the `mk_topo`
     function. For each network node, the directory named
-    `$CONFIGDIR/<node name>` (i.e. `cfg/<node name>`) will be mounted on /etc
-    (i.e., providing an overlay only visible to that node). 
+    `$CONFIGDIR/<node name>` (i.e. `cfg/<node name>`) will be mounted on `/etc`
+    (i.e., providing an overlay only visible to that node).
+    The `$CONFIGDIR/templates` will be mounted on `/templates` and `$CONFIGDIR/puppetmodules`
+    will be mounted on `/puppetmodules`.
     Two scripts are then executed on each node, if available and executable:
       * `$CONFIGDIR/<node name>_$BOOT` is executed right after the creation of
            the node, and before the creation of its links.
@@ -164,6 +166,52 @@ to the closest router.
      type `?` to see the list of available commands), or Quagga 
      (`telnet localhost zebra` or `telnet localhost ospf6d` ), ...
 
+## UCL Minimal Topology
+[ucl_topo](example_topo) defines a minimal UCL network,
+with only routers running OSPFv3 using [bird](https://bird.network.cz/).
+
+### Description
+
+```
+    +---- SH1C ----+
+    |              |
+Michotte        Halles ------ belnetb
+    |              |
+ Carnoy ----- Pythagore ----- belneta
+    |              |
+    +--- Stevin ---+
+```
+
+The [ucl_topo](ucl_topo) script defines a small topology with 6 routers
+and 2 links to two providers.
+
+### Scripts
+
+The routers all define a boot script, which reloads the sysctl configuration
+in every net NS (in this case: Enable IPv6 and IPv6 forwarding). Their startup
+script run a puppet scripts that fills a template and run bird6 on the produced
+configuration file.
+
+More specifically, the [puppet](https://en.wikipedia.org/wiki/Puppet_(software))
+`ucl_minimal_cfg/<node name>/puppet/site.pp`
+(mounted to `/etc/puppet/site.pp`) is executed. This script imports (i.e., execute)
+a [puppet module](https://puppet.com/docs/puppet/5.3/modules_fundamentals.html) called bird6.
+
+Modules are common to all the nodes and stored in
+`ucl_minimal_cfg/puppetmodules/` (mounted to `/puppetmodules/`).
+The puppet code is in `ucl_minimal_cfg/puppetmodules/bird6/manifests/init.pp`.
+This module defines a class with two parameters. Parameters are automatically filled
+by [hiera](https://puppet.com/docs/puppet/5.4/hiera_intro.html)
+that will look at `ucl_minimal_cfg/<node name>/puppet/data/node.yaml`
+for a value with key `<class-name>::<parameter-name>`.
+A hiera lookup for a given key can be explicitely requested (there is an example in the module).
+The `node.yaml` (a [YAML](https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html) file)
+is a database of any information specific to your node.
+
+The module is filling a template of a bird6 config stored in `ucl_minimal_cfg/templates/`.
+This template is written in [ERB](https://puppet.com/docs/puppet/5.3/lang_template_erb.html)
+and it has access to any local variable or parameters of the module.
+After filling this template, the puppet module launches `bird6`.
 
 ## Concepts
 
