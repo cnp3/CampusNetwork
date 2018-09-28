@@ -88,6 +88,8 @@ Two topologies are pre-defined to be started with the create_topo script.
      the next section for a detailed description.
   2. [project_topo](project_topo) defines the base topology to use (and change
      if needed) for the course project itself).
+  3. [ucl_topo](ucl_topo) defines the base UCL topology with OSPF configuration.
+     See the "UCL Minimal Topology" section below for a detailed description.
 
 By default, the `create_network.sh` script imports a few files from `/etc` in
 the different nodes order to help you. If you need additional files,
