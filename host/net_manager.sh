@@ -965,7 +965,7 @@ function set_hostnames {
 	done
         debg "Setting VM hostname for $hname"
         ssh -6 -b "${SSHBASE}::" -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" hostnamectl set-hostname "$hname"
-        ssh -6 -b "${SSHBASE}::" -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" sed  "s/127\.0\.1\.1\t.*/127.0.1.1\t${hname}/g" /etc/hosts
+        ssh -6 -b "${SSHBASE}::" -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" sed  "s/127.0.1.1\\\t.*/127.0.1.1\\\t${hname}/g" /etc/hosts
     done
 }
 
