@@ -86,8 +86,6 @@ Two topologies are pre-defined to be started with the create_topo script.
   1. [example_topo](example_topo) is a sample topology showing how to start a
      network, configure basic routing, as well as execute some tests in it. See
      the next section for a detailed description.
-  2. [project_topo](project_topo) defines the base topology to use (and change
-     if needed) for the course project itself).
   3. [ucl_topo](ucl_topo) defines the base UCL topology with OSPF configuration.
      See the "UCL Minimal Topology" section below for a detailed description.
 
