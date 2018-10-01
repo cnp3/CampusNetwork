@@ -49,4 +49,15 @@ function mk_topo {
     # Connect to belneta and belnetb
     bridge_node Pythagore eth1 belneta
     bridge_node Halles eth2 belnetb
+
+    echo "@@ Making the virtual network reachable from the host machine"
+    # Enable IPv6 forwarding on the bridges
+    sysctl -w net.ipv6.conf.breth1.forwarding=1
+    sysctl -w net.ipv6.conf.breth2.forwarding=1
+    # Add (hopefully) unique source addresses on the bridge
+    ip address add dev breth1 "fd00:300::${GROUPNUMBER}:1/64"
+    ip address add dev breth2 "fd00:200::${GROUPNUMBER}:1/64"
+    # Route the virtual network prefixes over the bridges
+    ip route add "fd00:300:${GROUPNUMBER}::/48" via "fd00:300::${GROUPNUMBER}"
+    ip route add "fd00:200:${GROUPNUMBER}::/48" via "fd00:200::${GROUPNUMBER}"
 }
