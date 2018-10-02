@@ -1,0 +1,11 @@
+---
+ping6:  # List of addresses that will be pinged
+  - "fd00:200:1::abcd"
+ssh:  # List of addresses that will receive connections on port 22
+  - "fd00:200:1::abcd"
+tcp:  # TCP connections to establish and the message (in hexadecimal) to send in this connection
+  - {ip: "fd00:200:1::abcd", port: 6000, message: "74657374"}
+udp:  # UDP connections to establish and the message (in hexadecimal) to send in this connection
+  - {ip: "fd00:200:1::abcd", port: 6000, message: "74657374"}
+dnsnames:  # List of DNS names that will be queried on the name servers
+  - "test.group1.ingi"
