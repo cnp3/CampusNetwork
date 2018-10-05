@@ -17,11 +17,13 @@ echo 'Destroying the root bridges'
 # Gracefully disconnect from the bridge in the root namespace (if any)
 for i in eth1\
          eth2; do
+    # Destroy slave of "br$i" because it does not always get destroyed
+    slave=$(ip link | grep "\-$i" | cut -d ":" -f 2 | cut -c 2-)
+    if ! [ -z "${slave}" ]; then
+        ip link del dev "${slave}"
+    fi
     ip link del dev "br$i" &> /dev/null
 done
-# Remove the added routes for the birdge prefix
-ip route del "$PREFIXB" via "fd00:300::${GROUPNUMBER}"
-ip route del "$PREFIXA" via "fd00:200::${GROUPNUMBER}"
 
 # Cleanup all network namespaces
 for ns in $(ip netns list) ; do
