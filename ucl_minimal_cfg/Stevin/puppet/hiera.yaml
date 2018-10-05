@@ -1,10 +1,10 @@
 ---
 :backends: yaml
 :yaml:
-  :datadir: "/etc/puppet/data"
+  :datadir: "/"
 :hierarchy:
-  - "node"
-  - "common"
+  - "etc/puppet/data/node"  # Node specific data
+  - "templates/data/common" # Data common for all nodes
 :logger: console
 :merge_behavior: native
 :deep_merge_options: {}
