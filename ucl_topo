@@ -12,6 +12,9 @@
 # is executable, it will be executed when the whole network has started
 #
 
+# IMPORTANT NOTE: Node names MUST NOT exceed 9 characters.
+# This is due to the limitation to 14 characters of interface names
+
 # You can override any of these settings on a per-topology basis
 # Group number
 GROUPNUMBER=42
