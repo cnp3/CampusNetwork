@@ -1,0 +1,5 @@
+---
+5:
+        - server_name: "ns1.group5.ingi" 
+          server_ip:   "fd00:300:5:2110::1"
+

@@ -17,3 +17,18 @@ Notable features:
 * Sample BGP looking glass available within the emulated network to let groups
   examine the status of the BGP peerings (available at `http://belneta.ingi`
   and `http://belnetb.ingi`, provided the DNS servers are setup properly).
+
+## DNS sub-domain delegation
+
+You can delegate the subdomain of each group by filling the `dns_group.yaml`
+and restarting the named daemon.
+
+The format of the YAML file is the following:
+```
+5:  # List of servers for the group 5
+        - server_name: "ns1.group5.ingi" 
+          server_ip:   "fd00:300:5:2110::1"
+        - server_name: "ns2.group5.ingi"
+          server_ip:   "fd00:300:5:2220::1"
+```
+

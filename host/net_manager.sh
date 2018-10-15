@@ -525,6 +525,9 @@ EOD
     echo "$named" > "$NAMEDCONF"
     echo "$zone" > "$ZONE_INGI"
     echo "$reverse" > "$REVERSE_INGI"
+
+    # DNS servers of the groups
+    python dns_group.py "$ZONE_INGI"
 }
 
 # Generate the tayga configuration
