@@ -24,7 +24,7 @@ CONFIGDIR=example_cfg
 BOOT="boot"
 # startup script name
 STARTUP="start"
-PREFIXBASE="fd00:${GROUPNUMBER}"
+PREFIXBASE="fde4:${GROUPNUMBER}"
 PREFIXLEN=32
 # You can reuse the above two to generate ip addresses/routes, ...
 # e.g. "${PREFIXBASE}:1234::/$((PREFIXLEN+16))"
@@ -49,7 +49,7 @@ function mk_topo {
 
     echo "@@ Briding the network"
     # Connect BELNET to its two connectivity providers
-    bridge_node BELNET eth1 as200
+    bridge_node BELNET eth5 grp2
     bridge_node BELNET eth2 as300
 }
 

@@ -1,0 +1,113 @@
+[
+  {
+    "name": "group1", "ssh_fwd": 40001, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:1::12", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:1::13", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:1::14", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:1::15", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:1::16", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:1::17", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:1::18", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group2", "ssh_fwd": 40002, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:2::22", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:2::23", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:2::24", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:2::25", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:2::26", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:2::27", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:2::28", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group3", "ssh_fwd": 40003, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:3::32", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:3::33", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:3::34", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:3::35", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:3::36", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:3::37", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:3::38", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group4", "ssh_fwd": 40004, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:4::42", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:4::43", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:4::44", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:4::45", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:4::46", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:4::47", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:4::48", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group5", "ssh_fwd": 40005, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:5::52", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:5::53", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:5::54", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:5::55", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:5::56", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:5::57", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:5::58", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group6", "ssh_fwd": 40006, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:6::62", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:6::63", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:6::64", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:6::65", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:6::66", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:6::67", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:6::68", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group7", "ssh_fwd": 40007, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:7::72", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:7::73", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:7::74", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:7::75", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:7::76", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:7::77", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:7::78", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group8", "ssh_fwd": 40008, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:8::82", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:8::83", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:8::84", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:8::85", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:8::86", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:8::87", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:8::88", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group9", "ssh_fwd": 40009, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:9::92", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:9::93", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:9::94", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:9::95", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:9::96", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:9::97", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:9::98", "promiscuous": "allow-all", "mask": 16}
+    ]
+  },
+  {
+    "name": "group10", "ssh_fwd": 40010, "memory": 2048, "nic": [
+      {"id": "2", "ip": "fde4:10::102", "promiscuous": "allow-all", "mask": 16},
+      {"id": "3", "ip": "fde4:10::103", "promiscuous": "allow-all", "mask": 16},
+      {"id": "4", "ip": "fde4:10::104", "promiscuous": "allow-all", "mask": 16},
+      {"id": "5", "ip": "fde4:10::105", "promiscuous": "allow-all", "mask": 16},
+      {"id": "6", "ip": "fde4:10::106", "promiscuous": "allow-all", "mask": 16},
+      {"id": "7", "ip": "fde4:10::107", "promiscuous": "allow-all", "mask": 16},
+      {"id": "8", "ip": "fde4:10::108", "promiscuous": "allow-all", "mask": 16}
+    ]
+  }
+
+]

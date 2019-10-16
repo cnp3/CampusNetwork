@@ -1,5 +1,7 @@
 #!/bin/bash
-
+export LIBGUESTFS_BACKEND=direct
+# PATH for debian chroot
+export PATH=$PATH:/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/sbin:/usr/bin
 # Main interface on the host machine
 INTERFACE="enp6s4f0"
 # Group numbers
@@ -9,7 +11,7 @@ QEMU=qemu-system-x86_64
 # Verbosity
 LOG_LEVEL=0  # Set to 1 to restrict to info+, 2 to warn, 3 to disable
 # Vagrant box version on Alas
-BOX_VERSION="8.10.0"
+BOX_VERSION="8.11.1"
 # disk image in the box
 VMDK_IMG="jessie.vmdk"
 # The master VM HD name
@@ -138,11 +140,26 @@ function del_chroot {
 function provision_disk {
     local parent
     parent=$(dirname "$BDIR")
-    cp "${parent}/${PROVISION_SCRIPT}" "$1"
+    cp "${parent}/${PROVISION_SCRIPT}" "$1" && sync
     # We'll need to resolve apt repositories
-    cp /etc/resolv.conf "${1}/etc/resolv.conf"
+
+    umount_qcow "${1}"
+    mount_qcow "${BASE_DISK}" "${1}"
+
+    ### ?????????????????????????????????????????????
+    ### WHY IT DOESN'T WORK ????????????????????
+
+    cp /etc/resolv.conf "${1}/etc/resolv.conf" && sync
+    sleep 5
+
+    if test -f "${1}/${PROVISION_SCRIPT}"; then
+      echo "${PROVISION_SCRIPT} exists"
+    else
+      echo "${PROVISION_SCRIPT} does NOT exist !!!"
+    fi
+
     debg "Executing provision script"
-    chroot "$1" "/${PROVISION_SCRIPT}"
+    chroot "$1" "/bin/bash -c \"/${PROVISION_SCRIPT}\""
     unlink "${1}/${PROVISION_SCRIPT}"
 }
 
@@ -171,8 +188,9 @@ function enable_sshd_login {
     debg "Authorizing the key"
     local k="${1}.pub"
     local sshdir="${3}${4}/.ssh"
-    mkdir -p "$sshdir"
-    cp "$k" "${sshdir}/authorized_keys"
+    mkdir -p "$sshdir" && sync
+    touch "${sshdir}/authorized_keys"
+    cp "$k" "${sshdir}/authorized_keys" && sync
     chroot "$3" chown -R "$2" "${4}/.ssh"
 }
 
@@ -182,7 +200,7 @@ function enable_sshd_login {
 function mount_qcow {
     debg "Mounting disk $1 on $2"
     mkdir -p "$2"
-    guestmount -a "$1" -i --pid mountpid.pid "$2"
+    guestmount -a "$1" -i --rw --pid mountpid.pid "$2"
     sleep .5
     mk_chroot "$2"
 }
@@ -418,7 +436,7 @@ ns2       IN    AAAA    ${BIND_ADDRESS}
 
 EOD
 
-    # TODO proper IPv6 address explosion functino
+    # TODO proper IPv6 address explosion function
     local reverse
     IFS='' read -r -d '' reverse << EOD || true
 \$TTL    604800
@@ -965,7 +983,7 @@ function set_hostnames {
                 break
             fi
             sleep 1
-	done
+	      done
         debg "Setting VM hostname for $hname"
         ssh -6 -b "${SSHBASE}::" -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" hostnamectl set-hostname "$hname"
         ssh -6 -b "${SSHBASE}::" -p 22 -o "IdentityFile=$MASTERKEY" -o ConnectTimeout=20 "${SSHBASE}::$g" sed  "s/127.0.1.1\\\t.*/127.0.1.1\\\t${hname}/g" /etc/hosts
@@ -1123,6 +1141,89 @@ function conn_vagra {
     set -x 
     ssh -6 -o "IdentityFile=group${1}" -p "$__ret" "vagrant@lingi2142tp.info.ucl.ac.be"
     set +x
+}
+
+function frr_install {
+  yes | yum -y install git autoconf automake libtool make \
+    readline-devel texinfo net-snmp-devel groff pkgconfig \
+    json-c-devel pam-devel bison flex pytest c-ares-devel \
+    python-devel systemd-devel python-sphinx libcap-devel
+
+  yes | yum -y install pcre-devel cmake wget
+
+  cd /tmp
+
+  wget -O libyang.tar.gz https://github.com/CESNET/libyang/archive/debian/libyang-0.16.105-1.tar.gz
+  mkdir libyang.dir
+  tar -zxf libyang.tar.gz -C libyang.dir
+  cd libyang.dir/libyang-debian-libyang-0.16.105-1
+  mkdir build; cd build
+  cmake -DENABLE_LYD_PRIV=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+      -D CMAKE_BUILD_TYPE:String="Release" -DENABLE_CACHE=OFF .. && \
+      make && make install
+
+  cd /tmp
+  rm -rf libyang.dir libyang.tar.gz
+
+  groupadd -g 92 frr
+  groupadd -r -g 85 frrvty
+  useradd -u 92 -g 92 -M -r -G frrvty -s /sbin/nologin \
+  -c "FRR FRRouting suite" -d /var/run/frr frr
+
+  git clone --depth 1 --single-branch --branch stable/7.1 https://github.com/FRRouting/frr.git frr
+  cd ./frr
+
+  ./bootstrap.sh && \
+  ./configure \
+    --bindir=/usr/bin \
+    --sbindir=/usr/lib/frr \
+    --sysconfdir=/etc/frr \
+    --libdir=/usr/lib/frr \
+    --libexecdir=/usr/lib/frr \
+    --localstatedir=/var/run/frr \
+    --with-moduledir=/usr/lib/frr/modules \
+    --with-libyang-pluginsdir=/usr/lib/frr/libyang_plugins \
+    --enable-snmp=agentx \
+    --enable-multipath=64 \
+    --enable-user=frr \
+    --enable-group=frr \
+    --enable-vty-group=frrvty \
+    --enable-systemd=yes \
+    --disable-exampledir \
+    --disable-ldpd \
+    --enable-fpm \
+    --with-pkg-git-version \
+    --with-pkg-extra-version=-lingi2142 \
+    SPHINXBUILD=/usr/bin/sphinx-build && \
+    make && make check && make install
+
+
+  mkdir -p /var/log/frr
+  mkdir -p /etc/frr
+  touch /etc/frr/zebra.conf
+  touch /etc/frr/bgpd.conf
+  touch /etc/frr/ospfd.conf
+  touch /etc/frr/ospf6d.conf
+  touch /etc/frr/isisd.conf
+  touch /etc/frr/ripd.conf
+  touch /etc/frr/ripngd.conf
+  touch /etc/frr/pimd.conf
+  touch /etc/frr/nhrpd.conf
+  touch /etc/frr/eigrpd.conf
+  touch /etc/frr/babeld.conf
+  chown -R frr:frr /etc/frr/
+  touch /etc/frr/vtysh.conf
+  chown frr:frrvty /etc/frr/vtysh.conf
+  chmod 640 /etc/frr/*.conf
+
+
+  install -p -m 644 tools/etc/frr/daemons /etc/frr/
+  chown frr:frr /etc/frr/daemons
+
+  install -p -m 644 ./tools/frr.service /usr/lib/systemd/system/frr.service
+
+  rm -rf /tmp/frr
+  true
 }
 
 function fetch_deps {
@@ -1433,6 +1534,7 @@ Usage: $0 {action} [param] where {action} is one of
     --status        Print the status of each VM
 
     --fetch-deps    Install the required dependencies to run this script
+    --frr-install   Install FRRouting suite
 EOD
     echo "$msg" >&2
 }
@@ -1459,6 +1561,7 @@ while getopts ":hskdrS:K:D:R:C:-:V:ntc:" optchar; do
                 tayga)   restart_tayga  ;;
                 help)    print_help     ;;
                 fetch-deps) fetch_deps  ;;
+                frr-install) frr_install;;
                 shutdown) shutdown_net  ;;
                 hostname) set_hostnames ;;
                 status)   vm_status     ;;

@@ -1,16 +1,18 @@
+#! /usr/bin/env python2
+
 """A simple HTTP server, that serves a given static html file"""
-import SocketServer
-import BaseHTTPServer
-import sys
+import os
 import shutil
 import socket
-import os
+import sys
 
+import BaseHTTPServer
+import SocketServer
 
 if len(sys.argv) < 3:
-    print "This scripts takes 2 arguments:"
-    print "     - The address on which to serve it"
-    print "     - The filename to server"
+    print("This scripts takes 2 arguments:")
+    print("     - The address on which to serve it")
+    print("     - The filename to server")
     sys.exit()
 
 PORT = 80
