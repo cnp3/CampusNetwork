@@ -79,4 +79,4 @@ update-rc.d bird6 disable &> /dev/null || true
 service bird stop
 service bird6 stop
 
-su vagrant -c 'cd && git clone https://github.com/UCL-INGI/lingi2142.git'
+su vagrant -c 'cd && git clone https://github.com/cnp3/CampusNetwork.git && cd CampusNetwork && git checkout isp_net'
