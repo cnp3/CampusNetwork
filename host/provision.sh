@@ -6,7 +6,8 @@ DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -qq --force-yes
 
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --force-yes \
   git bash vim htop tcpdump nano curl wget apt-transport-https ca-certificates \
-  bird6 inotify-tools iperf binutils binfmt-support software-properties-common
+  bird6 inotify-tools iperf binutils binfmt-support software-properties-common \
+  mtr python-pexpect python3-pexpect python-pexpect-doc netcat-openbsd
 
 ### build update and install FRRouting suite (official deb repo don't seem to work...)
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --force-yes \
@@ -29,7 +30,7 @@ adduser --system --ingroup frr --home /var/run/frr/ \
    --gecos "FRRouting suite" --shell /bin/false frr
 usermod -a -G frrvty frr
 
-git clone --depth 1 --single-branch --branch stable/7.1 https://github.com/FRRouting/frr.git /opt/frr
+git clone --depth 1 --single-branch --branch stable/7.2 https://github.com/FRRouting/frr.git /opt/frr
 cd /opt/frr || exit
 
 ./bootstrap.sh && \
