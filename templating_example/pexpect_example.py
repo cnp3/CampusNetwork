@@ -28,8 +28,12 @@ def trim_from_end(text, char):
 if __name__ == '__main__':
     # open a new remote connection via ssh
     child = pexpect.spawn('ssh thomas@localhost', timeout=120)
-    child.expect('password:')
+    idx = child.expect('password:', r"The authenticity of host .+ can't be established")
+
+    if idx == 1:
+        child.sendline('yes')
     child.sendline(__PASSWD)
+
     idx = child.expect([r'-bash-4\.2\$', 'Permission denied', 'thomas@PC-1S0-297'])
     if idx == 1:
         print("Can't connect to the remote server, exiting")
