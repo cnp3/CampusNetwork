@@ -19,7 +19,7 @@
 # Group number
 GROUPNUMBER=10
 # Node configs
-CONFIGDIR=mini_topo
+CONFIGDIR=mini_topo_frrouting_cfg
 # boot script name
 BOOT="boot"
 # startup script name
