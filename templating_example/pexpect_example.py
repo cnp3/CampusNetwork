@@ -51,7 +51,7 @@ if __name__ == '__main__':
         exit(0)
 
     # example to retrieve output of command
-    child.sendline('mtr -c5 --json 8.8.8.8')
+    child.sendline('sudo mtr -c5 --json 8.8.8.8')
 
     # trick to move the buffer to the beginning of output
     child.expect('mtr -c5 --json 8.8.8.8')

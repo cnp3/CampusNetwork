@@ -7,7 +7,8 @@ DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -y -qq --force-yes
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --force-yes \
   git bash vim htop tcpdump nano curl wget apt-transport-https ca-certificates \
   bird6 inotify-tools iperf binutils binfmt-support software-properties-common \
-  mtr python-pexpect python3-pexpect python-pexpect-doc netcat-openbsd
+  python-pexpect python3-pexpect python-pexpect-doc netcat-openbsd \
+  python-mako python3-mako
 
 ### build update and install FRRouting suite (official deb repo don't seem to work...)
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --force-yes \
@@ -16,6 +17,9 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --force-yes \
   libc-ares-dev python3-dev python3-sphinx build-essential libsystemd-dev \
   libsnmp-dev libcap-dev python3-pytest python-pytest libpcre++-dev \
   libpcre++0 libpcre3 libpcre3-dev cmake
+
+cd /tmp && git clone https://github.com/traviscross/mtr.git && cd mtr && ./bootstrap.sh \
+	&& ./configure && make && sudo make install && cd
 
 wget https://github.com/CESNET/libyang/archive/debian/libyang-0.16.105-1.tar.gz -O - \
     | tar -C /opt -xz && \
