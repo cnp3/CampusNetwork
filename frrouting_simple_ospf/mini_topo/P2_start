@@ -1,0 +1,17 @@
+#! /bin/sh
+
+# Assigning IP addr for P1-eth0
+ip link set dev P2-eth0 up
+ip -6 addr add fde4:10:12::22/64 dev P2-eth0
+
+# Assigning IP addr for P1-eth1
+ip link set dev P2-eth1 up
+ip -6 addr add fde4:10:23::22/64 dev P2-eth1
+
+# zebra is required to make the link between all FRRouting daemons
+# and the linux kernel routing table
+zebra -A 127.0.0.1 -f /etc/zebra.conf -z /tmp/p2.api -i /tmp/p2_zebra.pid &
+# launching FRRouting OSPF daemon
+ospf6d -f /etc/p2_ospf.conf -z /tmp/p2.api -i /tmp/p2_ospf6d.pid -A 127.0.0.1
+
+
