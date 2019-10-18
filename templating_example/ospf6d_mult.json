@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Swanky",
+    "hostname": "router1",
+    "passwd": "zebra",
+    "router_id": "0.251.23.5",
+    "interfaces": [
+      {
+        "name": "eth0",
+        "cost": 5,
+        "hello_time": 40,
+        "dead_time": 40,
+        "instance_id": 0,
+        "area": "0.0.0.0",
+        "active": true
+      },
+      {
+        "name": "eth5",
+        "cost": 5,
+        "instance_id": 0,
+        "area": "0.0.0.0",
+        "active": false
+      }
+    ]
+  },
+  {
+    "name": "Skynet",
+    "hostname": "router1",
+    "passwd": "zebra",
+    "router_id": "0.251.13.5",
+    "interfaces": [
+      {
+        "name": "eth2",
+        "cost": 4,
+        "hello_time": 20,
+        "dead_time": 35,
+        "instance_id": 0,
+        "area": "0.0.0.0",
+        "active": true
+      },
+      {
+        "name": "eth1",
+        "cost": 1,
+        "hello_time": 60,
+        "dead_time": 50,
+        "instance_id": 0,
+        "area": "0.0.0.0",
+        "active": true
+      }
+    ]
+  }
+]

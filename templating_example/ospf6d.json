@@ -1,0 +1,24 @@
+{
+  "name": "Swanky",
+  "hostname": "router1",
+  "passwd": "zebra",
+  "router_id": "0.251.23.5",
+  "interfaces": [
+    {
+      "name": "eth0",
+      "cost": 5,
+      "hello_time": 40,
+      "dead_time": 40,
+      "instance_id": 0,
+      "area": "0.0.0.0",
+      "active": true
+    },
+    {
+      "name": "eth5",
+      "cost": 5,
+      "instance_id": 0,
+      "area": "0.0.0.0",
+      "active": false
+    }
+  ]
+}
