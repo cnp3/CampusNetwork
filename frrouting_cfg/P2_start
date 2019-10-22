@@ -7,11 +7,9 @@ ip -6 addr add fde4:10:23::2222/128 dev lo
 
 # Assigning IP addr for P1-eth0
 ip link set dev P2-eth0 up
-ip -6 addr add fde4:10:12::22/64 dev P2-eth0
 
 # Assigning IP addr for P1-eth1
 ip link set dev P2-eth1 up
-ip -6 addr add fde4:10:23::22/64 dev P2-eth1
 
 # zebra is required to make the link between all FRRouting daemons
 # and the linux kernel routing table
