@@ -1,5 +1,10 @@
 #! /bin/sh
 ldconfig
+
+# Assigning IP addr for lo
+ip -6 addr add fde4:10:12::1111/128 dev lo
+ip -6 addr add fde4:10:13::1111/128 dev lo
+
 # Assigning IP addr for P1-eth0
 ip link set dev P1-eth0 up
 ip -6 addr add fde4:10:12::11/64 dev P1-eth0
