@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
         SHELL
 
         %for nic in group['nic']:
-        ${group['name']}.vm.network "private_network", ip: "${nic['ip']}", netmask: ${nic['mask']}, auto_config: false
+        ${group['name']}.vm.network "private_network", ip: "${nic['ip']}", netmask: "${nic['mask']}", auto_config: false
         %endfor
 
         ${group['name']}.vm.provider :virtualbox do |v|
