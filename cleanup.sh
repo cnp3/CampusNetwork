@@ -16,7 +16,7 @@ fi
 echo 'Destroying the root bridges'
 # Gracefully disconnect from the bridge in the root namespace (if any)
 for i in eth1\
-         eth2; do
+         eth2 eth3 eth4 eth5 eth6 eth7; do
     # Destroy slave of "br$i" because it does not always get destroyed
     slave=$(ip link | grep "\-$i" | cut -d ":" -f 2 | cut -c 2-)
     if ! [ -z "${slave}" ]; then
