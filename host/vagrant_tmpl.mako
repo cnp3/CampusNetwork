@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
 %for group in vm_config:
 
     config.vm.define "${group['name']}" do |${group['name']}|
-        ${group['name']}.vm.box = ${group['box']}
+        ${group['name']}.vm.box = "${group['box']}"
         ${group['name']}.vm.hostname = '${group['name']}'
         ${group['name']}.vm.box_check_update = true
         
