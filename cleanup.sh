@@ -18,7 +18,7 @@ echo 'Destroying the root bridges'
 for i in eth1\
          eth2 eth3 eth4 eth5 eth6 eth7; do
     # Destroy slave of "br$i" because it does not always get destroyed
-    slave=$(ip link | grep "\-$i" | cut -d ":" -f 2 | cut -c 2-)
+    slave=$(ip link | grep "\-$i" | cut -d ":" -f 2 | cut -c 2- | cut -d "@" -f 1)
     if ! [ -z "${slave}" ]; then
         ip link del dev "${slave}"
     fi
